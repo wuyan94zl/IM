@@ -2,11 +2,11 @@ package logic
 
 import (
 	"context"
-	"github.com/wuyan94zl/go-zero-blog/app/models/user"
-	"strconv"
-
+	"fmt"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
+	"github.com/wuyan94zl/go-zero-blog/app/models/user"
+	"github.com/wuyan94zl/go-zero-blog/app/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,7 +25,7 @@ func NewUserAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserAddLo
 	}
 }
 
-func (l *UserAddLogic) UserAdd(req *types.UserAddRequest) (resp *types.Response, err error) {
+func (l *UserAddLogic) UserAdd(req *types.UserAddRequest) (*utils.SuccessTmp, *utils.ErrorTmp) {
 	u := user.Users{
 		UserName: req.UserName,
 		NickName: req.NickName,
@@ -34,9 +34,9 @@ func (l *UserAddLogic) UserAdd(req *types.UserAddRequest) (resp *types.Response,
 	}
 	insert, err := l.svcCtx.UserModel.Insert(l.ctx, &u)
 	if err != nil {
-		return nil, err
+		return nil, utils.Error(500, err.Error())
 	}
 	id, _ := insert.LastInsertId()
-	resp.Message = strconv.Itoa(int(id))
-	return resp, nil
+
+	return utils.Success(fmt.Sprintf("用户ID：%d", id)), nil
 }

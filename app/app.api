@@ -10,7 +10,7 @@ type UserAddRequest {
 }
 
 type UserInfoRequest {
-	Id int `path:"id"json:"id"`
+	Id int64 `json:"id"`
 }
 
 service app-api {
@@ -18,5 +18,5 @@ service app-api {
 	post /user/add (UserAddRequest) returns (Response)
 	
 	@handler UserInfoHandler
-	post /user/info/:id (UserInfoRequest) returns (Response)
+	post /user/info (UserInfoRequest) returns (Response)
 }

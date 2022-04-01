@@ -20,7 +20,7 @@ func UserAddHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewUserAddLogic(r.Context(), svcCtx)
 		resp, err := l.UserAdd(&req)
 		if err != nil {
-			httpx.Error(w, err)
+			httpx.OkJson(w, err)
 		} else {
 			httpx.OkJson(w, resp)
 		}

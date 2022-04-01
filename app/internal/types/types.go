@@ -13,5 +13,5 @@ type UserAddRequest struct {
 }
 
 type UserInfoRequest struct {
-	Id int `json:"id"`
+	Id int64 `json:"id"`
 }
