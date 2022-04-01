@@ -8,6 +8,7 @@ import (
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
 
+	"github.com/jinzhu/copier"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -33,5 +34,9 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (*utils.SuccessTmp,
 		}
 		return nil, utils.Error(401, err.Error())
 	}
-	return utils.Success(info), nil
+	resp := types.User{}
+	copier.Copy(&resp, info)
+	resp.CreateTime = info.CreateTime.Time.Format("2006-01-02 15:04:05")
+	resp.UpdateTime = info.UpdateTime.Time.Format("2006-01-02 15:04:05")
+	return utils.Success(resp), nil
 }

@@ -5,6 +5,16 @@ type Response struct {
 	Message string `json:"message"`
 }
 
+type User struct {
+	Id         int64  `json:"id"`
+	UserName   string `json:"user_name"`
+	NickName   string `json:"nick_name"`
+	Password   string `json:"password"`
+	Mobile     string `json:"mobile"`
+	CreateTime string `json:"create_time"`
+	UpdateTime string `json:"update_time"`
+}
+
 type UserAddRequest struct {
 	UserName string `json:"user_name"`
 	NickName string `json:"nick_name"`
