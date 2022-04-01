@@ -1,15 +1,22 @@
 type Response {
-	Code      int    `json:"code"`
-	Data      string `json:"data"`
-	Message   string `json:"message"`
-	RequestId string `json:"request_id"`
+	Message string `json:"message"`
 }
 
-type UserListRequest {
-	Name string `json:"name"`
+type UserAddRequest {
+	UserName string `json:"user_name"`
+	NickName string `json:"nick_name"`
+	Password string `json:"password"`
+	Mobile   string `json:"mobile"`
+}
+
+type UserInfoRequest {
+	Id int `json:"id"`
 }
 
 service app-api {
-	@handler UserListHandler
-	post /users/lists (UserListRequest) returns (Response)
+	@handler UserAddHandler
+	post /user/add (UserAddRequest) returns (Response)
+	
+	@handler UserInfoHandler
+	post /user/info/:id (UserInfoRequest) returns (Response)
 }

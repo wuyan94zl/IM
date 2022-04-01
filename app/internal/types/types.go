@@ -2,12 +2,16 @@
 package types
 
 type Response struct {
-	Code      int    `json:"code"`
-	Data      string `json:"data"`
-	Message   string `json:"message"`
-	RequestId string `json:"request_id"`
+	Message string `json:"message"`
 }
 
-type UserListRequest struct {
-	Name string `json:"name"`
+type UserAddRequest struct {
+	UserName string `json:"user_name"`
+	NickName string `json:"nick_name"`
+	Password string `json:"password"`
+	Mobile   string `json:"mobile"`
+}
+
+type UserInfoRequest struct {
+	Id int `json:"id"`
 }

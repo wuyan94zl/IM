@@ -9,16 +9,16 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
-func UserListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func UserAddHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.UserListRequest
+		var req types.UserAddRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
 			return
 		}
 
-		l := logic.NewUserListLogic(r.Context(), svcCtx)
-		resp, err := l.UserList(&req)
+		l := logic.NewUserAddLogic(r.Context(), svcCtx)
+		resp, err := l.UserAdd(&req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

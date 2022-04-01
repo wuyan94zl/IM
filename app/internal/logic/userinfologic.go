@@ -9,22 +9,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type UserListLogic struct {
+type UserInfoLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewUserListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserListLogic {
-	return &UserListLogic{
+func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfoLogic {
+	return &UserInfoLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *UserListLogic) UserList(req *types.UserListRequest) (resp *types.Response, err error) {
-
+func (l *UserInfoLogic) UserInfo(req *types.UserAddRequest) (resp *types.Response, err error) {
+	req.
 
 	return
 }
