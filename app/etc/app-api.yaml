@@ -1,0 +1,17 @@
+Name: app-api
+Host: 0.0.0.0
+Port: 8888
+
+# redis
+Redis:
+  Host: localhost:6379
+  Type: node
+  Pass: 123456
+# 数据库 mysql
+DB:
+  DataSource: root:123456@tcp(mysql:3306)/blogs?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+# 缓存
+Cache:
+  - Host: localhost:6379
+    Pass: 123456

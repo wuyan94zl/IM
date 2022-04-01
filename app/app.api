@@ -1,0 +1,15 @@
+type Response {
+	Code      int    `json:"code"`
+	Data      string `json:"data"`
+	Message   string `json:"message"`
+	RequestId string `json:"request_id"`
+}
+
+type UserListRequest {
+	Name string `json:"name"`
+}
+
+service app-api {
+	@handler UserListHandler
+	post /users/lists (UserListRequest) returns (Response)
+}
