@@ -2,6 +2,9 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/wuyan94zl/go-zero-blog/app/models/user"
 
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
@@ -23,8 +26,15 @@ func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfo
 	}
 }
 
-func (l *UserInfoLogic) UserInfo(req *types.UserAddRequest) (resp *types.Response, err error) {
-	req.
-
-	return
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.Response, err error) {
+	info, err := l.svcCtx.UserModel.FindOne(l.ctx, int64(req.Id))
+	if err != nil {
+		if err == user.ErrNotFound {
+			return nil, fmt.Errorf("用户不存在")
+		}
+		return nil, err
+	}
+	strByte, _ := json.Marshal(info)
+	resp.Message = string(strByte)
+	return resp, nil
 }

@@ -10,7 +10,7 @@ type UserAddRequest {
 }
 
 type UserInfoRequest {
-	Id int `json:"id"`
+	Id int `path:"id"json:"id"`
 }
 
 service app-api {
