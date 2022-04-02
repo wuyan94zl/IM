@@ -51,6 +51,7 @@ service app-api {
 @server(
 	group: users
 	jwt: JwtAuth
+	middleware: AuthToken
 )
 service app-api {
 	@handler UserInfo

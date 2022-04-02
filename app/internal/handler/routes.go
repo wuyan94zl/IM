@@ -27,13 +27,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/info",
-				Handler: users.UserInfoHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthToken},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/info",
+					Handler: users.UserInfoHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
 	)
 }
