@@ -26,6 +26,7 @@ type (
 	UsersModel interface {
 		Insert(ctx context.Context, data *Users) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*Users, error)
+		FindRaw(ctx context.Context, params ...interface{}) (*Users, error)
 		Update(ctx context.Context, data *Users) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -67,6 +68,26 @@ func (m *defaultUsersModel) FindOne(ctx context.Context, id int64) (*Users, erro
 		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", usersRows, m.table)
 		return conn.QueryRowCtx(ctx, v, query, id)
 	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultUsersModel) FindRaw(ctx context.Context, params ...interface{}) (*Users, error) {
+	var resp Users
+	num := len(params) / 2
+	key, val := make([]string, num), make([]interface{}, num)
+	for i := 0; i < num; i++ {
+		k := i * 2
+		key[k] = fmt.Sprintf("`%v` = ?", params[i])
+		val[k] = params[i+1]
+	}
+	err := m.QueryRowNoCache(&resp, fmt.Sprintf("select %s from %s where %s limit 1", usersRows, m.table, strings.Join(key, " AND ")), val...)
 	switch err {
 	case nil:
 		return &resp, nil

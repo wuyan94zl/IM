@@ -1,9 +1,9 @@
-package handler
+package users
 
 import (
 	"net/http"
 
-	"github.com/wuyan94zl/go-zero-blog/app/internal/logic"
+	"github.com/wuyan94zl/go-zero-blog/app/internal/logic/users"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -17,7 +17,7 @@ func UserInfoHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := logic.NewUserInfoLogic(r.Context(), svcCtx)
+		l := users.NewUserInfoLogic(r.Context(), svcCtx)
 		resp, err := l.UserInfo(&req)
 		if err != nil {
 			httpx.OkJson(w, err)

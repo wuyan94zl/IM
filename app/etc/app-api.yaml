@@ -2,6 +2,10 @@ Name: app-api
 Host: 0.0.0.0
 Port: 8888
 
+JwtAuth:
+  AccessSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6I
+  AccessExpire: 604800
+
 # redis
 Redis:
   Host: localhost:6379

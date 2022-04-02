@@ -1,32 +1,58 @@
-type Response {
-	Message string `json:"message"`
-}
+syntax = "v1"
 
-type User {
-	Id         int64  `json:"id"`
-	UserName   string `json:"user_name"`
-	NickName   string `json:"nick_name"`
-	Password   string `json:"password"`
-	Mobile     string `json:"mobile"`
-	CreateTime string `json:"create_time"`
-	UpdateTime string `json:"update_time"`
-}
+info(
+	title: "go-zero-blog"
+	desc: "my first blog"
+	author: "wuyan94zl"
+	email: "466720682@qq.com"
+)
 
-type UserAddRequest {
+type RegisterRequest {
 	UserName string `json:"user_name"`
 	NickName string `json:"nick_name"`
 	Password string `json:"password"`
 	Mobile   string `json:"mobile"`
 }
 
-type UserInfoRequest {
-	Id int64 `json:"id"`
+type LoginRequest {
+	UserName string `json:"user_name"`
+	Password string `json:"password"`
 }
 
+type JwtTokenResponse {
+	AccessToken  string `json:"access_token"`
+	AccessExpire int64  `json:"access_expire"`
+	RefreshAfter int64  `json:"refresh_after"`
+}
+
+// @handler UserInfo
+type UserInfoRequest {
+}
+
+type UserInfoResponse {
+	Id       int64  `json:"id"`
+	UserName string `json:"user_name"`
+	NickName string `json:"nick_name"`
+	Password string `json:"password"`
+	Mobile   string `json:"mobile"`
+}
+
+@server(
+	group: users
+)
 service app-api {
-	@handler UserAddHandler
-	post /user/add (UserAddRequest) returns (Response)
+	@handler UserRegister
+	post /user/register (RegisterRequest) returns (JwtTokenResponse)
 	
-	@handler UserInfoHandler
-	post /user/info (UserInfoRequest) returns (Response)
+	@handler UserLogin
+	post /user/login (LoginRequest) returns (JwtTokenResponse)
+}
+
+@server(
+	group: users
+	jwt: JwtAuth
+)
+service app-api {
+	@handler UserInfo
+	post /user/info (UserInfoRequest) returns (UserInfoResponse)
 }
