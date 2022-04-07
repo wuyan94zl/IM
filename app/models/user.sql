@@ -8,8 +8,5 @@ CREATE TABLE users
     create_time TIMESTAMP NULL,
     update_time TIMESTAMP NULL,
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci
-COMMENT='用户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户表';
 -- goctl model mysql ddl -src="./user.sql" -dir="./user" -c

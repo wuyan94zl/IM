@@ -28,7 +28,7 @@ func NewUserRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *User
 
 func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*utils2.SuccessTmp, *utils2.ErrorTmp) {
 	// 验证用户是否存在
-	_, err := l.svcCtx.UserModel.FindRaw(l.ctx, "user_name", req.UserName)
+	_, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err == nil {
 		return nil, utils2.Error(401, "用户已存在")
 	}

@@ -28,7 +28,7 @@ func NewUserLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserLog
 }
 
 func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*utils2.SuccessTmp, *utils2.ErrorTmp) {
-	info, err := l.svcCtx.UserModel.FindRaw(l.ctx, "user_name", req.UserName)
+	info, err := l.svcCtx.UserModel.FindRawByName(l.ctx,req.UserName)
 	if err != nil {
 		if err == user.ErrNotFound {
 			return nil, utils2.Error(401, "用户名不存在")
