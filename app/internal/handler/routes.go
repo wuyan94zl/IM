@@ -65,6 +65,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/friend/list",
 					Handler: friend.FriendListHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/message/list",
+					Handler: friend.MessageListHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),

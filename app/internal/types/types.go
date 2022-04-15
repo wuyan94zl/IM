@@ -59,3 +59,20 @@ type Friend struct {
 type FriendList struct {
 	List []Friend `json:"list"`
 }
+
+type MessageListRequest struct {
+	ChannelId    string `json:"channel_id"`
+	MinMessageId int64  `json:"min_message_id"`
+}
+
+type Message struct {
+	UserId   int64  `json:"user_id"`
+	Tp       int64  `json:"type"`
+	NickName string `json:"nick_name"`
+	Content  string `json:"content"`
+	SendTime string `json:"send_time"`
+}
+
+type MessageListResponse struct {
+	List []Message `json:"list"`
+}

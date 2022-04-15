@@ -88,6 +88,23 @@ type FriendList {
 	List []Friend `json:"list"`
 }
 
+type MessageListRequest {
+	ChannelId    string `json:"channel_id"`
+	MinMessageId int64  `json:"min_message_id"`
+}
+
+type Message {
+	UserId   int64  `json:"user_id"`
+	Tp       int64  `json:"type"`
+	NickName string `json:"nick_name"`
+	Content  string `json:"content"`
+	SendTime string `json:"send_time"`
+}
+
+type MessageListResponse {
+	List []Message `json:"list"`
+}
+
 @server(
 	group: friend
 	jwt: JwtAuth
@@ -105,4 +122,7 @@ service app-api {
 	
 	@handler FriendList
 	post /friend/list () returns (FriendList)
+	
+	@handler MessageList
+	post /message/list (MessageListRequest) returns (MessageListResponse)
 }

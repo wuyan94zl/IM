@@ -5,12 +5,17 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/chart"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
+	"github.com/wuyan94zl/go-zero-blog/app/models/messages"
 	"net/http"
 	"strconv"
+	"time"
 )
 
-const AesKey = "wuyan94zl1asdfghjklqwertyuiopzas"
-const publicChanelId = "wuyan94zl:im:public"
+const (
+	AesKey         = "wuyan94zl1asdfghjklqwertyuiopzas"
+	publicChanelId = "wuyan94zl:im:public"
+	sendMessage    = 100
+)
 
 func Run(ctx *svc.ServiceContext) {
 	mux := http.NewServeMux()
@@ -33,6 +38,23 @@ type data struct {
 }
 
 func (d *data) SendMessage(msg chart.Message) {
+	fmt.Println("send message callback ", msg)
+	switch msg.Type {
+	case sendMessage:
+		local, _ := time.LoadLocation("Asia/Shanghai")
+		sendTime, err := time.ParseInLocation("2006-01-02 15:01:05", "2022-04-15 22:12:12",local)
+		fmt.Println(sendTime, err, msg.SendTime)
+		if err != nil {
+			return
+		}
+		message := messages.Messages{
+			ChannelId:  msg.ChannelId,
+			SendUserId: int64(msg.UserId),
+			Message:    msg.Content,
+			//CreateTime: sendTime,
+		}
+		d.ctx.MessageModel.Insert(context.Background(), &message)
+	}
 	fmt.Println("send message callback ", msg.ChannelId, msg.Content, msg.Type, msg.SendTime, msg.UserId)
 }
 
