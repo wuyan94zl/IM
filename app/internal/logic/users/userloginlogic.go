@@ -28,7 +28,7 @@ func NewUserLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserLog
 }
 
 func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*utils2.SuccessTmp, *utils2.ErrorTmp) {
-	info, err := l.svcCtx.UserModel.FindRawByName(l.ctx,req.UserName)
+	info, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err != nil {
 		if err == user.ErrNotFound {
 			return nil, utils2.Error(401, "用户名不存在")
@@ -45,11 +45,11 @@ func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*utils2.SuccessTmp,
 	data["id"] = info.Id
 	data["nick_name"] = info.NickName
 	token, err := genToken(now, l.svcCtx.Config.JwtAuth.AccessSecret, data, accessExpire)
-
 	return utils2.Success(types.JwtTokenResponse{
 		AccessToken:  token,
 		AccessExpire: now + accessExpire,
 		RefreshAfter: now + accessExpire/2,
+		WsToken:      info.Id,
 	}), nil
 }
 

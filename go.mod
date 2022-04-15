@@ -2,6 +2,8 @@ module github.com/wuyan94zl/go-zero-blog
 
 go 1.18
 
+replace github.com/wuyan94zl/chart => ../chart
+
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/zeromicro/go-zero v1.3.2
@@ -22,6 +24,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/justinas/alice v1.2.0 // indirect
 	github.com/lib/pq v1.10.4 // indirect
@@ -36,6 +39,7 @@ require (
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/urfave/cli v1.22.5 // indirect
+	github.com/wuyan94zl/chart v0.0.0-20220412082137-a42b83ae40e6 // indirect
 	github.com/zeromicro/antlr v0.0.1 // indirect
 	github.com/zeromicro/ddl-parser v1.0.3 // indirect
 	github.com/zeromicro/go-zero/tools/goctl v1.3.4 // indirect

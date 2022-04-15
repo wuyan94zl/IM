@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	friend "github.com/wuyan94zl/go-zero-blog/app/internal/handler/friend"
 	users "github.com/wuyan94zl/go-zero-blog/app/internal/handler/users"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 
@@ -34,6 +35,35 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/user/info",
 					Handler: users.UserInfoHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthToken},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/friend/add",
+					Handler: friend.FriendAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/friend/handle",
+					Handler: friend.FriendHandleHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/friend/del",
+					Handler: friend.FriendDelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/friend/list",
+					Handler: friend.FriendListHandler(serverCtx),
 				},
 			}...,
 		),

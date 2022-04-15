@@ -23,6 +23,18 @@ type JwtTokenResponse {
 	AccessToken  string `json:"access_token"`
 	AccessExpire int64  `json:"access_expire"`
 	RefreshAfter int64  `json:"refresh_after"`
+	WsToken      int64  `json:"ws_token"`
+}
+
+@server(
+	group: users
+)
+service app-api {
+	@handler UserRegister
+	post /user/register (RegisterRequest) returns (JwtTokenResponse)
+	
+	@handler UserLogin
+	post /user/login (LoginRequest) returns (JwtTokenResponse)
 }
 
 // @handler UserInfo
@@ -39,21 +51,58 @@ type UserInfoResponse {
 
 @server(
 	group: users
-)
-service app-api {
-	@handler UserRegister
-	post /user/register (RegisterRequest) returns (JwtTokenResponse)
-	
-	@handler UserLogin
-	post /user/login (LoginRequest) returns (JwtTokenResponse)
-}
-
-@server(
-	group: users
 	jwt: JwtAuth
 	middleware: AuthToken
 )
 service app-api {
 	@handler UserInfo
 	post /user/info (UserInfoRequest) returns (UserInfoResponse)
+}
+
+type FriendRequest {
+	FriendId int64 `json:"friend_id"`
+}
+
+type FriendResponse {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
+type SearchUsersRequest {
+	NickName string `json:"nick_name"`
+}
+
+type FriendHandleRequest {
+	ActionLogId int64 `json:"action_log_id"`
+	ActionType  int64 `json:"action_type"`
+}
+
+type Friend {
+	UserId    int64  `json:"user_id"`
+	NickName  string `json:"nick_name"`
+	IsFriend  int64  `json:"is_friend"`
+	ChannelId string `json:"channel_id"`
+}
+
+type FriendList {
+	List []Friend `json:"list"`
+}
+
+@server(
+	group: friend
+	jwt: JwtAuth
+	middleware: AuthToken
+)
+service app-api {
+	@handler FriendAdd
+	post /friend/add (FriendRequest) returns (FriendResponse)
+	
+	@handler FriendHandle
+	post /friend/handle (FriendHandleRequest) returns (FriendResponse)
+	
+	@handler FriendDel
+	post /friend/del (FriendRequest) returns (FriendResponse)
+	
+	@handler FriendList
+	post /friend/list () returns (FriendList)
 }

@@ -17,6 +17,7 @@ type JwtTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	AccessExpire int64  `json:"access_expire"`
 	RefreshAfter int64  `json:"refresh_after"`
+	WsToken      int64  `json:"ws_token"`
 }
 
 type UserInfoRequest struct {
@@ -28,4 +29,33 @@ type UserInfoResponse struct {
 	NickName string `json:"nick_name"`
 	Password string `json:"password"`
 	Mobile   string `json:"mobile"`
+}
+
+type FriendRequest struct {
+	FriendId int64 `json:"friend_id"`
+}
+
+type FriendResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
+type SearchUsersRequest struct {
+	NickName string `json:"nick_name"`
+}
+
+type FriendHandleRequest struct {
+	ActionLogId int64 `json:"action_log_id"`
+	ActionType  int64 `json:"action_type"`
+}
+
+type Friend struct {
+	UserId    int64  `json:"user_id"`
+	NickName  string `json:"nick_name"`
+	IsFriend  int64  `json:"is_friend"`
+	ChannelId string `json:"channel_id"`
+}
+
+type FriendList struct {
+	List []Friend `json:"list"`
 }
