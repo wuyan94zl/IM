@@ -31,16 +31,16 @@ func (l *MessageListLogic) MessageList(req *types.MessageListRequest) (resp *typ
 	}
 	id, _ := l.ctx.Value("id").(json.Number).Int64()
 	var rlt types.MessageListResponse
-	for _, v := range list {
+	for i := len(list) - 1; i >= 0; i-- {
 		t := 0
-		if v.SendUserId == id {
+		if list[i].SendUserId == id {
 			t = 1
 		}
 		rlt.List = append(rlt.List, types.Message{
-			UserId:   v.SendUserId,
+			UserId:   list[i].SendUserId,
 			NickName: "test",
-			Content:  v.Message,
-			SendTime: v.CreateTime.Format("2006-01-02 15:01:05"),
+			Content:  list[i].Message,
+			SendTime: list[i].CreateTime.Format("2006-01-02 15:01:05"),
 			Tp:       int64(t),
 		})
 	}

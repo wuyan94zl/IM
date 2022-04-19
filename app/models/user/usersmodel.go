@@ -19,6 +19,7 @@ type (
 		usersModel
 		FindRawByName(ctx context.Context, userName string) (*Users, error)
 		Friends(hasUserModel hasusers.UserUsersModel, userId int64) ([]Users, error)
+		GetListByKeyword(keyword string) ([]Users, error)
 	}
 
 	customUsersModel struct {
@@ -60,13 +61,37 @@ func (m *customUsersModel) Friends(hasUserModel hasusers.UserUsersModel, userId 
 
 	var resp []Users
 	ids := strings.Repeat(" ,?", len(friendIds))
+	if len(ids) < 3 {
+		return resp, ErrNotFound
+	}
 	query := fmt.Sprintf("select %s from %s where `id` in (%s)", usersRows, m.table, ids[2:])
 	err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, friendIds...)
 	switch err {
 	case nil:
 		return resp, nil
 	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
+		return resp, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customUsersModel) GetListByKeyword(keyword string) ([]Users, error) {
+	var resp []Users
+	var err error
+	if keyword != "" {
+		query := fmt.Sprintf("select %s from %s where `nick_name` like ? limit 20", usersRows, m.table)
+		fmt.Println(query)
+		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, keyword+"%")
+	} else {
+		query := fmt.Sprintf("select %s from %s limit 20", usersRows, m.table)
+		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query)
+	}
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlc.ErrNotFound:
+		return resp, ErrNotFound
 	default:
 		return nil, err
 	}

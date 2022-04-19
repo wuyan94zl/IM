@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wuyan94zl/go-zero-blog/app/models/actionlogs"
+	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
 
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
@@ -40,7 +40,7 @@ func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.Friend
 
 	err = l.svcCtx.UserUsersModel.Delete(l.ctx, friend[0].Id)
 	err = l.svcCtx.UserUsersModel.Delete(l.ctx, friend[1].Id)
-	l.svcCtx.ActionLogModel.Insert(l.ctx, &actionlogs.ActionLogs{PubUserId: id, SubUserId: req.FriendId, HandleResult: "删除", Status: 1, Tp: 2})
+	l.svcCtx.NoticeModel.Insert(l.ctx, &notices.Notices{PubUserId: id, SubUserId: req.FriendId, Content: "把删除从ta的好友移除", Status: 1, Tp: 2})
 	if err != nil {
 		return &types.FriendResponse{
 			Status:  false,

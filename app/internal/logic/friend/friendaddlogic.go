@@ -6,9 +6,9 @@ import (
 	"github.com/wuyan94zl/go-zero-blog/app/common/im"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
-	"github.com/wuyan94zl/go-zero-blog/app/models/actionlogs"
-
+	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
 	"github.com/zeromicro/go-zero/core/logx"
+	"time"
 )
 
 type FriendAddLogic struct {
@@ -35,17 +35,33 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 			Message: "对方已经是你好友",
 		}, nil
 	}
-	log, err := l.svcCtx.ActionLogModel.CheckSendAddFriend(id, req.FriendId)
+	log, err := l.svcCtx.NoticeModel.CheckSendAddFriend(id, req.FriendId)
 	if log != nil {
+		strByte, _ := json.Marshal(types.Notice{
+			Id: log.Id, Tp: log.Tp, IsAgree: log.IsAgree, Status: log.Status,
+			NickName: "", Content: log.Content, CreateTime: log.CreateTime.Format("2006-01-06 15:04:01"),
+		})
+		im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte))
 		return &types.FriendResponse{
 			Status:  false,
 			Message: "添加好友请求已经发送",
 		}, nil
 	}
-	_, err = l.svcCtx.ActionLogModel.Insert(l.ctx, &actionlogs.ActionLogs{PubUserId: id, SubUserId: req.FriendId, Tp: 1})
+
+	link, _ := l.svcCtx.NoticeModel.Insert(l.ctx, &notices.Notices{PubUserId: id, SubUserId: id, Tp: 1, Content: "你请求添加XXX为好友", IsAgree: "未处理", Status: 1, CreateTime: time.Now()})
+	linkId, _ := link.LastInsertId()
+
+	addLog := notices.Notices{PubUserId: id, SubUserId: req.FriendId, Tp: 1, Content: "请求添加您为好友！", CreateTime: time.Now(), LinkId: linkId}
+	ins, err := l.svcCtx.NoticeModel.Insert(l.ctx, &addLog)
+
 	switch err {
 	case nil:
-		im.SendMessageToUid(uint64(id), uint64(req.FriendId), "请求添加好友")
+		lastId, _ := ins.LastInsertId()
+		strByte, _ := json.Marshal(types.Notice{
+			Id: lastId, Tp: 1, IsAgree: "",
+			NickName: "", Content: addLog.Content, CreateTime: addLog.CreateTime.Format("2006-01-06 15:04:01"),
+		})
+		im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte))
 		return &types.FriendResponse{
 			Status:  true,
 			Message: "添加好友请求已发送",

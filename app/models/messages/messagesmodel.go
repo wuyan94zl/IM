@@ -33,7 +33,7 @@ func (m *customMessagesModel) GetListByChannelId(channelId string, minId int64) 
 	if minId > 0 {
 		idWhere = fmt.Sprintf("`id` < %d", minId)
 	}
-	query := fmt.Sprintf("select %s from %s where `channel_id` = ? %s order by id ASC limit 20", messagesRows, m.table, idWhere)
+	query := fmt.Sprintf("select %s from %s where `channel_id` = ? %s order by id desc limit 20", messagesRows, m.table, idWhere)
 	err := m.conn.QueryRows(&resp, query, channelId)
 	switch err {
 	case nil:

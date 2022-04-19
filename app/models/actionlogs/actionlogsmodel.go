@@ -13,6 +13,7 @@ type (
 	ActionLogsModel interface {
 		actionLogsModel
 		CheckSendAddFriend(userId, friendId int64) (*ActionLogs, error)
+		GetListByUserId(userId int64) ([]ActionLogs, error)
 	}
 
 	customActionLogsModel struct {
@@ -36,6 +37,18 @@ func (m *customActionLogsModel) CheckSendAddFriend(userId, friendId int64) (*Act
 		return nil, nil
 	case nil:
 		return &resp, nil
+	default:
+		return nil, err
+	}
+}
+
+func (m *customActionLogsModel) GetListByUserId(userId int64) ([]ActionLogs, error) {
+	var resp []ActionLogs
+	query := fmt.Sprintf("select %s from %s where `sub_user_id` = ? order by id desc limit 20", actionLogsRows, m.table)
+	err := m.conn.QueryRows(&resp, query, userId)
+	switch err {
+	case nil:
+		return resp, nil
 	default:
 		return nil, err
 	}

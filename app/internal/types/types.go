@@ -31,6 +31,19 @@ type UserInfoResponse struct {
 	Mobile   string `json:"mobile"`
 }
 
+type UserListRequest struct {
+	Keyword string `json:"keyword"`
+}
+
+type UserList struct {
+	Id       int64  `json:"id"`
+	NickName string `json:"nick_name"`
+}
+
+type UserListResponse struct {
+	List []UserList `json:"list"`
+}
+
 type FriendRequest struct {
 	FriendId int64 `json:"friend_id"`
 }
@@ -75,4 +88,18 @@ type Message struct {
 
 type MessageListResponse struct {
 	List []Message `json:"list"`
+}
+
+type Notice struct {
+	Id         int64  `json:"id"`
+	Tp         int64  `json:"type"`
+	IsAgree    string `json:"is_agree"`
+	NickName   string `json:"nick_name"`
+	Content    string `json:"content"`
+	CreateTime string `json:"create_time"`
+	Status     int64  `json:"status"`
+}
+
+type NoticeListResponse struct {
+	List []Notice `json:"list"`
 }

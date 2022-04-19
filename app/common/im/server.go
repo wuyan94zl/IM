@@ -25,7 +25,7 @@ func Run(ctx *svc.ServiceContext) {
 		if err != nil {
 			return
 		}
-		chart.NewServer(w, r, uint64(info.Id), &data{ctx: ctx})
+		chart.NewServer(w, r, uint64(info.Id), info.NickName, &data{ctx: ctx})
 	})
 	err := http.ListenAndServe(":8899", mux)
 	if err != nil {
@@ -42,7 +42,7 @@ func (d *data) SendMessage(msg chart.Message) {
 	switch msg.Type {
 	case sendMessage:
 		local, _ := time.LoadLocation("Asia/Shanghai")
-		sendTime, err := time.ParseInLocation("2006-01-02 15:01:05", "2022-04-15 22:12:12",local)
+		sendTime, err := time.ParseInLocation("2006-01-02 15:01:05", "2022-04-15 22:12:12", local)
 		fmt.Println(sendTime, err, msg.SendTime)
 		if err != nil {
 			return
