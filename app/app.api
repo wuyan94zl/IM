@@ -124,6 +124,7 @@ type MessageListResponse {
 type Notice {
 	Id         int64  `json:"id"`
 	Tp         int64  `json:"type"`
+	LinkId     int64  `json:"link_id"`
 	IsAgree    string `json:"is_agree"`
 	NickName   string `json:"nick_name"`
 	Content    string `json:"content"`

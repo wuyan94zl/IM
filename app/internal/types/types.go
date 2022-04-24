@@ -37,6 +37,7 @@ type UserListRequest struct {
 
 type UserList struct {
 	Id       int64  `json:"id"`
+	IsFriend int64  `json:"is_friend"`
 	NickName string `json:"nick_name"`
 }
 
@@ -93,6 +94,7 @@ type MessageListResponse struct {
 type Notice struct {
 	Id         int64  `json:"id"`
 	Tp         int64  `json:"type"`
+	LinkId     int64  `json:"link_id"`
 	IsAgree    string `json:"is_agree"`
 	NickName   string `json:"nick_name"`
 	Content    string `json:"content"`

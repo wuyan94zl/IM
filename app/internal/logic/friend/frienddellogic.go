@@ -3,8 +3,9 @@ package friend
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/wuyan94zl/go-zero-blog/app/common/im"
 	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
+	"strconv"
 
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
@@ -30,7 +31,6 @@ func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.Friend
 	id, _ := l.ctx.Value("id").(json.Number).Int64()
 
 	friend, err := l.svcCtx.UserUsersModel.CheckFriend(id, req.FriendId)
-	fmt.Println(friend, err)
 	if len(friend) != 2 || err != nil {
 		return &types.FriendResponse{
 			Status:  false,
@@ -48,6 +48,7 @@ func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.Friend
 		}, nil
 	}
 
+	im.SendMessageToChannelIds(uint64(id), strconv.FormatInt(req.FriendId, 10), 202, im.GenChannelIdByFriend(id, req.FriendId))
 	return &types.FriendResponse{
 		Status:  true,
 		Message: "删除好友成功",

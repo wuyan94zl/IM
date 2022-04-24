@@ -1,6 +1,6 @@
 Name: app-api
 Host: 0.0.0.0
-Port: 8888
+Port: 9999
 
 JwtAuth:
   AccessSecret: eyJhbGciOiJIUzI1NiIsInR5cCI6I
@@ -14,7 +14,7 @@ Redis:
 
 # 数据库 mysql
 DB:
-  DataSource: root:123456@tcp(127.0.0.1:3306)/blogs?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+  DataSource: root:123456@tcp(127.0.0.1:3306)/chat?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
 
 # 缓存
 Cache:

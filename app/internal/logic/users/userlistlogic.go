@@ -2,11 +2,11 @@ package users
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
-
+	"github.com/wuyan94zl/go-zero-blog/app/models/user"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -25,14 +25,37 @@ func NewUserListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserList
 }
 
 func (l *UserListLogic) UserList(req *types.UserListRequest) (resp *types.UserListResponse, err error) {
-	list, err := l.svcCtx.UserModel.GetListByKeyword(req.Keyword)
-	fmt.Println(list,err)
+	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	list, err := l.svcCtx.UserModel.GetListByKeyword(req.Keyword, id)
+
 	if err != nil {
 		return nil, err
 	}
+	isFriend := l.isFriend(list, id)
 	var rlt types.UserListResponse
 	for _, v := range list {
-		rlt.List = append(rlt.List, types.UserList{Id: v.Id, NickName: v.NickName})
+		item := types.UserList{Id: v.Id, NickName: v.NickName, IsFriend: 0}
+		if _, ok := isFriend[v.Id]; ok {
+			item.IsFriend = 1
+		}
+		rlt.List = append(rlt.List, item)
 	}
 	return &rlt, nil
+}
+
+func (l *UserListLogic) isFriend(list []user.Users, userId int64) map[int64]bool {
+	var id []interface{}
+	isFriend := make(map[int64]bool)
+	for _, v := range list {
+		id = append(id, v.Id)
+	}
+	friend, err := l.svcCtx.UserUsersModel.IsFriend(userId, id...)
+	fmt.Println(friend)
+	if err != nil {
+		return isFriend
+	}
+	for _, v := range friend {
+		isFriend[v.HasUserId] = true
+	}
+	return isFriend
 }

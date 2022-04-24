@@ -17,18 +17,27 @@ const (
 	sendMessage    = 100
 )
 
+type cliDetail struct {
+	NickName  string `json:"nick_name"`
+	Phone     string `json:"phone"`
+	HeadProto string `json:"head_proto"`
+}
+
 func Run(ctx *svc.ServiceContext) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		token, _ := strconv.Atoi(r.FormValue("_token"))
 		info, err := ctx.UserModel.FindOne(context.Background(), int64(token))
 		if err != nil {
+			fmt.Println("ws 连接错误：", err)
 			return
 		}
-		chart.NewServer(w, r, uint64(info.Id), info.NickName, &data{ctx: ctx})
+		chart.NewServer(w, r, uint64(info.Id), cliDetail{NickName: info.NickName, Phone: info.Mobile, HeadProto: "test uri"}, &data{ctx: ctx})
 	})
-	err := http.ListenAndServe(":8899", mux)
+	fmt.Printf("Starting Ws Server at 0.0.0.0:9988...\n")
+	err := http.ListenAndServe(":9988", mux)
 	if err != nil {
+		fmt.Println("ws err：", err)
 		return
 	}
 }
@@ -58,6 +67,10 @@ func (d *data) SendMessage(msg chart.Message) {
 	fmt.Println("send message callback ", msg.ChannelId, msg.Content, msg.Type, msg.SendTime, msg.UserId)
 }
 
+func (d *data) DelaySendMessage(channelId string, msg chart.Message, uIds []uint64) {
+	fmt.Println(channelId, msg, uIds)
+}
+
 // LoginServer 登录成功后回调
 func (d *data) LoginServer(uid uint64) {
 	list, _ := d.ctx.UserModel.Friends(d.ctx.UserUsersModel, int64(uid))
@@ -77,10 +90,18 @@ func (d *data) ErrorLogServer(err error) {
 	fmt.Println("err: ", err)
 }
 
-func SendMessageToUid(uid, toUId uint64, msg string) {
-	chart.SendMessageToUid(uid, toUId, msg)
+func JoinChannelIds(uid uint64, channelIds ...string) {
+	chart.JoinChannelIds(uid, channelIds...)
+}
+
+func SendMessageToUid(uid, toUId uint64, msg string, tp uint8) {
+	chart.SendMessageToUid(uid, toUId, msg, tp)
+}
+
+func SendMessageToChannelIds(uid uint64, msg string, tp uint8, channelIds ...string) {
+	chart.SendMessageToChannelIds(uid, msg, tp, channelIds...)
 }
 
 func SendMessageToUser(uid uint64) {
-	chart.SendMessageToChannelIds(uid, "添加", "ddd")
+
 }

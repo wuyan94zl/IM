@@ -7,7 +7,6 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"strings"
 )
 
 var _ UsersModel = (*customUsersModel)(nil)
@@ -19,7 +18,7 @@ type (
 		usersModel
 		FindRawByName(ctx context.Context, userName string) (*Users, error)
 		Friends(hasUserModel hasusers.UserUsersModel, userId int64) ([]Users, error)
-		GetListByKeyword(keyword string) ([]Users, error)
+		GetListByKeyword(keyword string, id int64) ([]Users, error)
 	}
 
 	customUsersModel struct {
@@ -49,23 +48,10 @@ func (m *customUsersModel) FindRawByName(ctx context.Context, userName string) (
 }
 
 func (m *customUsersModel) Friends(hasUserModel hasusers.UserUsersModel, userId int64) ([]Users, error) {
-	// 关联数据
-	hasUsers, err := hasUserModel.Friends(userId)
-	if err != nil {
-		return nil, err
-	}
-	var friendIds []interface{}
-	for _, friend := range hasUsers {
-		friendIds = append(friendIds, friend.HasUserId)
-	}
-
 	var resp []Users
-	ids := strings.Repeat(" ,?", len(friendIds))
-	if len(ids) < 3 {
-		return resp, ErrNotFound
-	}
-	query := fmt.Sprintf("select %s from %s where `id` in (%s)", usersRows, m.table, ids[2:])
-	err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, friendIds...)
+	rows := "users.`id`, users.`user_name`, users.`nick_name`, users.`password`, users.`mobile`, users.`create_time`, users.`update_time`"
+	query := fmt.Sprintf("select %s from %s join user_users on user_users.`has_user_id` = users.`id` where user_users.`user_id` = ?", rows, m.table)
+	err := m.QueryRowsNoCacheCtx(context.Background(), &resp, query, userId)
 	switch err {
 	case nil:
 		return resp, nil
@@ -76,16 +62,16 @@ func (m *customUsersModel) Friends(hasUserModel hasusers.UserUsersModel, userId 
 	}
 }
 
-func (m *customUsersModel) GetListByKeyword(keyword string) ([]Users, error) {
+func (m *customUsersModel) GetListByKeyword(keyword string, id int64) ([]Users, error) {
 	var resp []Users
 	var err error
 	if keyword != "" {
-		query := fmt.Sprintf("select %s from %s where `nick_name` like ? limit 20", usersRows, m.table)
+		query := fmt.Sprintf("select %s from %s where `nick_name` like ? and id != ? limit 20", usersRows, m.table)
 		fmt.Println(query)
-		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, keyword+"%")
+		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, keyword+"%", id)
 	} else {
-		query := fmt.Sprintf("select %s from %s limit 20", usersRows, m.table)
-		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query)
+		query := fmt.Sprintf("select %s from %s where id != ? limit 20", usersRows, m.table)
+		err = m.QueryRowsNoCacheCtx(context.Background(), &resp, query, id)
 	}
 	switch err {
 	case nil:

@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/wuyan94zl/go-zero-blog/app/common/im"
-	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
-	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
-
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
+	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
+	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
+	"strconv"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -49,34 +49,6 @@ func (l *FriendHandleLogic) FriendHandle(req *types.FriendHandleRequest) (resp *
 	log.Status = 1
 	link, _ := l.svcCtx.NoticeModel.FindOne(l.ctx, log.LinkId)
 	return l.setFriend(log, link, req.ActionType, id)
-	//switch req.ActionType {
-	//case 1:
-	//	l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: id, HasUserId: log.PubUserId})
-	//	l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: log.PubUserId, HasUserId: id})
-	//	log.IsAgree = "已同意"
-	//	l.svcCtx.NoticeModel.Update(l.ctx, log)
-	//	link.IsAgree = "已同意"
-	//	l.svcCtx.NoticeModel.Update(l.ctx, link)
-	//	strByte, _ := json.Marshal(types.Notice{
-	//		Id: log.Id, Tp: log.Tp, IsAgree: log.IsAgree,
-	//		NickName: "", Content: log.Content, CreateTime: log.CreateTime.Format("2006-01-06 15:04:01"),
-	//	})
-	//	im.SendMessageToUid(uint64(id), uint64(log.PubUserId), string(strByte))
-	//	//im.SendMessageToUid(uint64(id), uint64(log.PubUserId), "同意了你的好友申请")
-	//	return &types.FriendResponse{Status: true, Message: "添加成功"}, nil
-	//default:
-	//	log.IsAgree = "已拒绝"
-	//	l.svcCtx.NoticeModel.Update(l.ctx, log)
-	//	link.IsAgree = "被拒绝"
-	//	l.svcCtx.NoticeModel.Update(l.ctx, link)
-	//	strByte, _ := json.Marshal(types.Notice{
-	//		Id: log.Id, Tp: log.Tp, IsAgree: log.IsAgree,
-	//		NickName: "", Content: log.Content, CreateTime: log.CreateTime.Format("2006-01-06 15:04:01"),
-	//	})
-	//	im.SendMessageToUid(uint64(id), uint64(log.PubUserId), string(strByte))
-	//	//im.SendMessageToUid(uint64(id), uint64(log.PubUserId), "拒绝了你的好友申请")
-	//	return &types.FriendResponse{Status: false, Message: "拒绝添加好友"}, nil
-	//}
 }
 
 func (l *FriendHandleLogic) setFriend(log, link *notices.Notices, tp, id int64) (resp *types.FriendResponse, err error) {
@@ -96,10 +68,13 @@ func (l *FriendHandleLogic) setFriend(log, link *notices.Notices, tp, id int64) 
 	}
 	l.svcCtx.NoticeModel.Update(l.ctx, log)
 	l.svcCtx.NoticeModel.Update(l.ctx, link)
-	strByte, _ := json.Marshal(types.Notice{
-		Id: log.Id, Tp: log.Tp, IsAgree: log.IsAgree,
-		NickName: "", Content: log.Content, CreateTime: log.CreateTime.Format("2006-01-06 15:04:01"),
-	})
-	im.SendMessageToUid(uint64(id), uint64(log.PubUserId), string(strByte))
+	if tp == 1 {
+		channelId := im.GenChannelIdByFriend(id, log.PubUserId)
+		im.JoinChannelIds(uint64(id), channelId)
+		im.JoinChannelIds(uint64(log.PubUserId), channelId)
+		im.SendMessageToChannelIds(uint64(id), "1", 201, channelId)
+	} else {
+		im.SendMessageToUid(uint64(id), uint64(log.PubUserId), strconv.FormatInt(tp, 10), 201)
+	}
 	return rlt, nil
 }
