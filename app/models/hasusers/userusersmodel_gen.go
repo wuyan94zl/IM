@@ -38,9 +38,10 @@ type (
 	}
 
 	UserUsers struct {
-		Id        int64 `db:"id"`
-		UserId    int64 `db:"user_id"`
-		HasUserId int64 `db:"has_user_id"`
+		Id        int64  `db:"id"`
+		UserId    int64  `db:"user_id"`
+		HasUserId int64  `db:"has_user_id"`
+		ChannelId string `db:"channel_id"`
 	}
 )
 
@@ -54,8 +55,8 @@ func newUserUsersModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultUserUsersMo
 func (m *defaultUserUsersModel) Insert(ctx context.Context, data *UserUsers) (sql.Result, error) {
 	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?)", m.table, userUsersRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, userUsersRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId)
 	}, userUsersIdKey)
 	return ret, err
 }
@@ -81,7 +82,7 @@ func (m *defaultUserUsersModel) Update(ctx context.Context, data *UserUsers) err
 	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userUsersRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId, data.Id)
 	}, userUsersIdKey)
 	return err
 }

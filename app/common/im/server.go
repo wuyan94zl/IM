@@ -2,10 +2,12 @@ package im
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/wuyan94zl/chart"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/models/messages"
+	"github.com/wuyan94zl/go-zero-blog/app/models/sendqueue"
 	"net/http"
 	"strconv"
 	"time"
@@ -46,13 +48,11 @@ type data struct {
 	ctx *svc.ServiceContext
 }
 
+// 发送消息回调
 func (d *data) SendMessage(msg chart.Message) {
-	fmt.Println("send message callback ", msg)
 	switch msg.Type {
 	case sendMessage:
-		local, _ := time.LoadLocation("Asia/Shanghai")
-		sendTime, err := time.ParseInLocation("2006-01-02 15:01:05", "2022-04-15 22:12:12", local)
-		fmt.Println(sendTime, err, msg.SendTime)
+		sendTime, err := time.Parse("2006-01-02 15:01:05", "2022-04-15 22:12:12")
 		if err != nil {
 			return
 		}
@@ -60,15 +60,30 @@ func (d *data) SendMessage(msg chart.Message) {
 			ChannelId:  msg.ChannelId,
 			SendUserId: int64(msg.UserId),
 			Message:    msg.Content,
-			//CreateTime: sendTime,
+			CreateTime: sendTime,
 		}
 		d.ctx.MessageModel.Insert(context.Background(), &message)
 	}
-	fmt.Println("send message callback ", msg.ChannelId, msg.Content, msg.Type, msg.SendTime, msg.UserId)
 }
 
-func (d *data) DelaySendMessage(channelId string, msg chart.Message, uIds []uint64) {
-	fmt.Println(channelId, msg, uIds)
+func (d *data) DelaySendMessage(channelId string, msg chart.Message, sent []uint64) {
+	users, err := d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
+	if err != nil {
+		return
+	}
+	sentMap := make(map[int64]bool)
+	for _, v := range sent {
+		sentMap[int64(v)] = true
+	}
+	msgByte, err := json.Marshal(msg)
+	if err != nil {
+		return
+	}
+	for _, user := range users {
+		if _, ok := sentMap[user.UserId]; !ok {
+			d.ctx.SendQueueModel.Insert(context.Background(), &sendqueue.SendQueues{UserId: user.UserId, Message: string(msgByte), SendUserId: int64(msg.UserId)})
+		}
+	}
 }
 
 // LoginServer 登录成功后回调
@@ -78,8 +93,16 @@ func (d *data) LoginServer(uid uint64) {
 	for _, v := range list {
 		channelIds = append(channelIds, GenChannelIdByFriend(int64(uid), v.Id))
 	}
-	channelIds = append(channelIds, publicChanelId)
+	//channelIds = append(channelIds, publicChanelId)
 	chart.JoinChannelIds(uid, channelIds...)
+	go func() {
+		time.Sleep(time.Second * 2)
+		queues, _ := d.ctx.SendQueueModel.FindByUserId(context.Background(), int64(uid))
+		for _, queue := range queues {
+			SendMessageToUid(uid, uid, queue.Message, 100)
+			d.ctx.SendQueueModel.Delete(context.Background(), queue.Id)
+		}
+	}()
 }
 func (d *data) LogoutServer(uid uint64) {
 	// 退出登陆回调
@@ -88,20 +111,4 @@ func (d *data) LogoutServer(uid uint64) {
 func (d *data) ErrorLogServer(err error) {
 	// 错误消息回调
 	fmt.Println("err: ", err)
-}
-
-func JoinChannelIds(uid uint64, channelIds ...string) {
-	chart.JoinChannelIds(uid, channelIds...)
-}
-
-func SendMessageToUid(uid, toUId uint64, msg string, tp uint8) {
-	chart.SendMessageToUid(uid, toUId, msg, tp)
-}
-
-func SendMessageToChannelIds(uid uint64, msg string, tp uint8, channelIds ...string) {
-	chart.SendMessageToChannelIds(uid, msg, tp, channelIds...)
-}
-
-func SendMessageToUser(uid uint64) {
-
 }

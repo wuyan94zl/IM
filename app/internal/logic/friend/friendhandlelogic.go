@@ -54,8 +54,8 @@ func (l *FriendHandleLogic) FriendHandle(req *types.FriendHandleRequest) (resp *
 func (l *FriendHandleLogic) setFriend(log, link *notices.Notices, tp, id int64) (resp *types.FriendResponse, err error) {
 	rlt := new(types.FriendResponse)
 	if tp == 1 {
-		l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: id, HasUserId: log.PubUserId})
-		l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: log.PubUserId, HasUserId: id})
+		l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: id, HasUserId: log.PubUserId, ChannelId: im.GenChannelIdByFriend(id, log.PubUserId)})
+		l.svcCtx.UserUsersModel.Insert(l.ctx, &hasusers.UserUsers{UserId: log.PubUserId, HasUserId: id, ChannelId: im.GenChannelIdByFriend(id, log.PubUserId)})
 		log.IsAgree = "已同意"
 		link.IsAgree = "已同意"
 		rlt.Status = true

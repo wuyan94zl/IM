@@ -17,6 +17,7 @@ type (
 		CheckFriend(userId, friendId int64) ([]UserUsers, error)
 		IsFriend(userId int64, friendId ...interface{}) ([]UserUsers, error)
 		Friends(userId int64) ([]UserUsers, error)
+		AllChannelIdUsers(channelId string) ([]UserUsers, error)
 	}
 
 	customUserUsersModel struct {
@@ -64,6 +65,17 @@ func (m *customUserUsersModel) Friends(userId int64) ([]UserUsers, error) {
 	var resp []UserUsers
 	query := fmt.Sprintf("select %s from %s where `user_id` = ?", userUsersRows, m.table)
 	err := m.QueryRowsNoCache(&resp, query, userId)
+	if err == nil {
+		return resp, nil
+	} else {
+		return nil, err
+	}
+}
+
+func (m *customUserUsersModel) AllChannelIdUsers(channelId string) ([]UserUsers, error) {
+	var resp []UserUsers
+	query := fmt.Sprintf("select %s from %s where `channel_id` = ?", userUsersRows, m.table)
+	err := m.QueryRowsNoCache(&resp, query, channelId)
 	if err == nil {
 		return resp, nil
 	} else {
