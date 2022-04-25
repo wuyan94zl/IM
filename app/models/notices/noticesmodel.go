@@ -18,7 +18,7 @@ type (
 		CheckSendAddFriend(userId, friendId int64) (*Notices, error)
 		GetListByUserId(userId int64) ([]ListItem, error)
 		TransInsert(ctx context.Context, session sqlx.Session, data *Notices) (sql.Result, error)
-		AddFriend(userId, friendId int64, userNickName, friendNickName string) (*Notices, *Notices, error)
+		AddFriend(userId, friendId int64, userNickName, friendNickName string) (*Notices, error)
 	}
 
 	customNoticesModel struct {
@@ -78,21 +78,21 @@ func (m *defaultNoticesModel) TransInsert(ctx context.Context, session sqlx.Sess
 	return ret, err
 }
 
-func (m *customNoticesModel) AddFriend(userId, friendId int64, userNickName, friendNickName string) (*Notices, *Notices, error) {
-	linkAdd := Notices{PubUserId: userId, SubUserId: userId, Tp: 1, Content: fmt.Sprintf("你请求添加%s为好友", friendNickName), IsAgree: "未处理", Status: 1, CreateTime: time.Now()}
+func (m *customNoticesModel) AddFriend(userId, friendId int64, userNickName, friendNickName string) (*Notices, error) {
+	//linkAdd := Notices{PubUserId: userId, SubUserId: userId, Tp: 1, Content: fmt.Sprintf("你请求添加%s为好友", friendNickName), IsAgree: "未处理", Status: 1, CreateTime: time.Now()}
 	noticeAdd := Notices{PubUserId: userId, SubUserId: friendId, Tp: 1, Content: fmt.Sprintf("%s请求添加您为好友", userNickName), CreateTime: time.Now()}
 	err := m.conn.Transact(func(session sqlx.Session) error {
-		link, _ := m.TransInsert(context.Background(), session, &linkAdd)
-		linkId, _ := link.LastInsertId()
-		linkAdd.Id = linkId
-		noticeAdd.LinkId = linkId
+		//link, _ := m.TransInsert(context.Background(), session, &linkAdd)
+		//linkId, _ := link.LastInsertId()
+		//linkAdd.Id = linkId
+		//noticeAdd.LinkId = linkId
 		notice, _ := m.TransInsert(context.Background(), session, &noticeAdd)
 		noticeId, _ := notice.LastInsertId()
 		noticeAdd.Id = noticeId
 		return nil
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("添加好友申请失败：%s", err.Error())
+		return nil, fmt.Errorf("添加好友申请失败：%s", err.Error())
 	}
-	return &linkAdd, &noticeAdd, nil
+	return &noticeAdd, nil
 }

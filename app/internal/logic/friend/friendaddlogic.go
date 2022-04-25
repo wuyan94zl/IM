@@ -3,10 +3,13 @@ package friend
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/wuyan94zl/go-zero-blog/app/common/im"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
+	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
 	"github.com/zeromicro/go-zero/core/logx"
+	"time"
 )
 
 type FriendAddLogic struct {
@@ -35,11 +38,6 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 	}
 	log, err := l.svcCtx.NoticeModel.CheckSendAddFriend(id, req.FriendId)
 	if log != nil {
-		//strByte, _ := json.Marshal(types.Notice{
-		//	Id: log.Id, Tp: log.Tp, IsAgree: log.IsAgree, Status: log.Status,
-		//	NickName: "", Content: log.Content, CreateTime: log.CreateTime.Format("2006-01-06 15:04:01"),
-		//})
-		//im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte))
 		return &types.FriendResponse{
 			Status:  false,
 			Message: "添加好友请求已经发送",
@@ -47,20 +45,13 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 	}
 
 	user, _ := l.svcCtx.UserModel.FindOne(l.ctx, id)
-	friend, _ := l.svcCtx.UserModel.FindOne(l.ctx, req.FriendId)
-	link, notice, err := l.svcCtx.NoticeModel.AddFriend(user.Id, friend.Id, user.NickName, friend.NickName)
+	noticeAdd := notices.Notices{PubUserId: id, SubUserId: req.FriendId, Tp: 1, Content: fmt.Sprintf("%s 请求添加您为好友", user.NickName), CreateTime: time.Now()}
+	insert, _ := l.svcCtx.NoticeModel.Insert(l.ctx, &noticeAdd)
+	noticeAdd.Id, err = insert.LastInsertId()
 	switch err {
 	case nil:
-		strByte, _ := json.Marshal(types.Notice{
-			Id: notice.Id, Tp: 1, IsAgree: "", LinkId: notice.LinkId,
-			NickName: "", Content: notice.Content, CreateTime: notice.CreateTime.Format("2006-01-06 15:04:01"),
-		})
+		strByte, _ := json.Marshal(noticeAdd)
 		im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte), 200)
-		strByte, _ = json.Marshal(types.Notice{
-			Id: link.Id, Tp: 1, IsAgree: link.IsAgree, LinkId: link.LinkId, Status: link.Status,
-			NickName: "", Content: link.Content, CreateTime: link.CreateTime.Format("2006-01-06 15:04:01"),
-		})
-		im.SendMessageToUid(uint64(id), uint64(id), string(strByte), 200)
 		return &types.FriendResponse{
 			Status:  true,
 			Message: "添加好友请求已发送",
