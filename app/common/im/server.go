@@ -14,8 +14,6 @@ import (
 )
 
 const (
-	AesKey         = "wuyan94zl1asdfghjklqwertyuiopzas"
-	publicChanelId = "wuyan94zl:im:public"
 	sendMessage    = 100
 )
 
@@ -23,6 +21,16 @@ type cliDetail struct {
 	NickName  string `json:"nick_name"`
 	Phone     string `json:"phone"`
 	HeadProto string `json:"head_proto"`
+}
+
+func RunWs(w http.ResponseWriter, r *http.Request, svcCtx *svc.ServiceContext) {
+	token, _ := strconv.Atoi(r.FormValue("_token"))
+	info, err := svcCtx.UserModel.FindOne(context.Background(), int64(token))
+	if err != nil {
+		fmt.Println("ws 连接参数错误：", err)
+	} else {
+		chart.NewServer(w, r, uint64(info.Id), cliDetail{NickName: info.NickName, Phone: info.Mobile, HeadProto: "test uri"}, &data{ctx: svcCtx})
+	}
 }
 
 func Run(ctx *svc.ServiceContext) {
