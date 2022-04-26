@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/chart"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
+	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
 	"github.com/wuyan94zl/go-zero-blog/app/models/messages"
 	"github.com/wuyan94zl/go-zero-blog/app/models/sendqueue"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 )
 
 const (
-	sendMessage    = 100
+	sendMessage = 100
 )
 
 type cliDetail struct {
@@ -75,10 +76,17 @@ func (d *data) SendMessage(msg chart.Message) {
 }
 
 func (d *data) DelaySendMessage(channelId string, msg chart.Message, sent []uint64) {
-	users, err := d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
-	if err != nil {
-		return
+	var users []hasusers.UserUsers
+	var err error
+	if channelId == "" {
+		users = append(users, hasusers.UserUsers{UserId: int64(msg.ToUserId)})
+	} else {
+		users, err = d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
+		if err != nil {
+			return
+		}
 	}
+
 	sentMap := make(map[int64]bool)
 	for _, v := range sent {
 		sentMap[int64(v)] = true
