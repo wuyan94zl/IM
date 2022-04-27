@@ -1,0 +1,46 @@
+syntax = "v1"
+
+type MessageListRequest {
+    ChannelId    string `json:"channel_id"`
+    MinMessageId int64  `json:"min_message_id"`
+}
+
+type Message {
+    UserId   int64  `json:"user_id"`
+    Tp       int64  `json:"type"`
+    NickName string `json:"nick_name"`
+    Content  string `json:"content"`
+    SendTime string `json:"send_time"`
+}
+
+type MessageListResponse {
+    List []Message `json:"list"`
+}
+
+type Notice {
+    Id         int64  `json:"id"`
+    Tp         int64  `json:"type"`
+    LinkId     int64  `json:"link_id"`
+    IsAgree    string `json:"is_agree"`
+    NickName   string `json:"nick_name"`
+    Content    string `json:"content"`
+    CreateTime string `json:"create_time"`
+    Status     int64  `json:"status"`
+}
+
+type NoticeListResponse {
+    List []Notice `json:"list"`
+}
+
+@server(
+    group: friend
+    jwt: JwtAuth
+    middleware: AuthToken
+)
+service app-api {
+    @handler MessageList
+    post /message/list (MessageListRequest) returns (MessageListResponse)
+
+    @handler NoticeList
+    post /notice/list () returns (NoticeListResponse)
+}

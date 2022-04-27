@@ -1,0 +1,70 @@
+syntax = "v1"
+
+type RegisterRequest {
+    UserName string `json:"user_name"`
+    NickName string `json:"nick_name"`
+    Password string `json:"password"`
+    Mobile   string `json:"mobile"`
+}
+
+type LoginRequest {
+    UserName string `json:"user_name"`
+    Password string `json:"password"`
+}
+
+type JwtTokenResponse {
+    AccessToken  string `json:"access_token"`
+    AccessExpire int64  `json:"access_expire"`
+    RefreshAfter int64  `json:"refresh_after"`
+    WsToken      int64  `json:"ws_token"`
+}
+
+@server(
+    group: users
+)
+service app-api {
+    @handler UserRegister
+    post /user/register (RegisterRequest) returns (JwtTokenResponse)
+
+    @handler UserLogin
+    post /user/login (LoginRequest) returns (JwtTokenResponse)
+}
+
+// @handler UserInfo
+type UserInfoRequest {
+}
+
+type UserInfoResponse {
+    Id       int64  `json:"id"`
+    UserName string `json:"user_name"`
+    NickName string `json:"nick_name"`
+    Password string `json:"password"`
+    Mobile   string `json:"mobile"`
+}
+
+type UserListRequest {
+    Keyword string `json:"keyword"`
+}
+
+type UserList {
+    Id       int64  `json:"id"`
+    IsFriend int64 `json:"is_friend"`
+    NickName string `json:"nick_name"`
+}
+
+type UserListResponse {
+    List []UserList `json:"list"`
+}
+
+@server(
+    group: users
+    jwt: JwtAuth
+    middleware: AuthToken
+)
+service app-api {
+    @handler UserInfo
+    post /user/info (UserInfoRequest) returns (UserInfoResponse)
+
+    @handler UserList
+    post /user/list (UserListRequest) returns (UserListResponse)
+}

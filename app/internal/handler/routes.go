@@ -70,6 +70,15 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/friend/list",
 					Handler: friend.FriendListHandler(serverCtx),
 				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthToken},
+			[]rest.Route{
 				{
 					Method:  http.MethodPost,
 					Path:    "/message/list",
