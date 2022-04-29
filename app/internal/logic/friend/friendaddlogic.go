@@ -51,7 +51,7 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 	switch err {
 	case nil:
 		strByte, _ := json.Marshal(noticeAdd)
-		im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte), 200)
+		go im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte), 200)
 		return &types.FriendResponse{
 			Status:  true,
 			Message: "添加好友请求已发送",

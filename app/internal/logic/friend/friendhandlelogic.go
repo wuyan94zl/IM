@@ -73,10 +73,10 @@ func (l *FriendHandleLogic) setFriend(log *notices.Notices, tp, id int64) (resp 
 
 	if tp == 1 {
 		channelId := im.GenChannelIdByFriend(id, log.PubUserId)
-		im.JoinChannelIds(uint64(id), channelId)
-		im.JoinChannelIds(uint64(log.PubUserId), channelId)
+		go im.JoinChannelIds(uint64(id), channelId)
+		go im.JoinChannelIds(uint64(log.PubUserId), channelId)
 	}
 	strByte, _ := json.Marshal(handleNotice)
-	im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), 200)
+	go im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), 200)
 	return rlt, nil
 }

@@ -48,7 +48,7 @@ func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.Friend
 		}, nil
 	}
 
-	im.SendMessageToChannelIds(uint64(id), strconv.FormatInt(req.FriendId, 10), 202, im.GenChannelIdByFriend(id, req.FriendId))
+	go im.SendMessageToChannelIds(uint64(id), strconv.FormatInt(req.FriendId, 10), 202, im.GenChannelIdByFriend(id, req.FriendId))
 	return &types.FriendResponse{
 		Status:  true,
 		Message: "删除好友成功",

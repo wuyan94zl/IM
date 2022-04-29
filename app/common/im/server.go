@@ -34,6 +34,17 @@ func RunWs(w http.ResponseWriter, r *http.Request, svcCtx *svc.ServiceContext) {
 	}
 }
 
+type Server struct {
+	Ctx *svc.ServiceContext
+}
+
+func (i Server) Start() {
+	Run(i.Ctx)
+}
+func (i Server) Stop() {
+	fmt.Println("im service was stop...")
+}
+
 func Run(ctx *svc.ServiceContext) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -109,10 +120,9 @@ func (d *data) LoginServer(uid uint64) {
 	for _, v := range list {
 		channelIds = append(channelIds, GenChannelIdByFriend(int64(uid), v.Id))
 	}
-	//channelIds = append(channelIds, publicChanelId)
 	chart.JoinChannelIds(uid, channelIds...)
 	go func() {
-		time.Sleep(time.Second * 2)
+		time.Sleep(time.Second * 1)
 		queues, _ := d.ctx.SendQueueModel.FindByUserId(context.Background(), int64(uid))
 		for _, queue := range queues {
 			SendMessageToUid(uid, uid, queue.Message, 100)

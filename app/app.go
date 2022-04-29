@@ -9,6 +9,7 @@ import (
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/rest"
 )
 
@@ -26,15 +27,12 @@ func main() {
 
 	handler.RegisterHandlers(server, ctx)
 
-	//server.AddRoute(rest.Route{
-	//	Method: http.MethodGet,
-	//	Path:   "/ws",
-	//	Handler: func(w http.ResponseWriter, r *http.Request) {
-	//		im.RunWs(w, r, ctx)
-	//	},
-	//})
-	go im.Run(ctx)
-
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	server.Start()
+	//server.Start()
+
+	group := service.NewServiceGroup()
+	defer group.Stop()
+	group.Add(server)
+	group.Add(im.Server{Ctx: ctx})
+	group.Start()
 }
