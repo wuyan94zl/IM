@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
-	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
+	"github.com/wuyan94zl/IM/app/models/hasusers"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"

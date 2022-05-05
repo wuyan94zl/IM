@@ -1,7 +1,7 @@
 package im
 
 import (
-	"github.com/wuyan94zl/go-zero-blog/app/common/utils"
+	"github.com/wuyan94zl/IM/app/common/utils"
 	"strconv"
 )
 

@@ -3,8 +3,8 @@ package friend
 import (
 	"net/http"
 
-	"github.com/wuyan94zl/go-zero-blog/app/internal/logic/friend"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
+	"github.com/wuyan94zl/IM/app/internal/logic/friend"
+	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

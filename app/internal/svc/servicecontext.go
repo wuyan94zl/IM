@@ -1,14 +1,14 @@
 package svc
 
 import (
-	"github.com/wuyan94zl/go-zero-blog/app/common/auth"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/config"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/middleware"
-	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
-	"github.com/wuyan94zl/go-zero-blog/app/models/messages"
-	"github.com/wuyan94zl/go-zero-blog/app/models/notices"
-	"github.com/wuyan94zl/go-zero-blog/app/models/sendqueue"
-	"github.com/wuyan94zl/go-zero-blog/app/models/user"
+	"github.com/wuyan94zl/IM/app/common/auth"
+	"github.com/wuyan94zl/IM/app/internal/config"
+	"github.com/wuyan94zl/IM/app/internal/middleware"
+	"github.com/wuyan94zl/IM/app/models/hasusers"
+	"github.com/wuyan94zl/IM/app/models/messages"
+	"github.com/wuyan94zl/IM/app/models/notices"
+	"github.com/wuyan94zl/IM/app/models/sendqueue"
+	"github.com/wuyan94zl/IM/app/models/user"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
 )

@@ -1,4 +1,4 @@
-module github.com/wuyan94zl/go-zero-blog
+module github.com/wuyan94zl/IM
 
 go 1.18
 

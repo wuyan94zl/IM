@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"github.com/wuyan94zl/go-zero-blog/app/common/auth"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/config"
+	"github.com/wuyan94zl/IM/app/common/auth"
+	"github.com/wuyan94zl/IM/app/internal/config"
 	"net/http"
 )
 

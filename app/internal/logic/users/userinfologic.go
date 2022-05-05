@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"context"
 	"encoding/json"
-	"github.com/wuyan94zl/go-zero-blog/app/common/utils"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
+	"github.com/wuyan94zl/IM/app/common/utils"
+	"github.com/wuyan94zl/IM/app/internal/svc"
+	"github.com/wuyan94zl/IM/app/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

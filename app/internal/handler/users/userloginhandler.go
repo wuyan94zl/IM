@@ -3,9 +3,9 @@ package users
 import (
 	"net/http"
 
-	"github.com/wuyan94zl/go-zero-blog/app/internal/logic/users"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/types"
+	"github.com/wuyan94zl/IM/app/internal/logic/users"
+	"github.com/wuyan94zl/IM/app/internal/svc"
+	"github.com/wuyan94zl/IM/app/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 

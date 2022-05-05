@@ -4,9 +4,9 @@ package handler
 import (
 	"net/http"
 
-	friend "github.com/wuyan94zl/go-zero-blog/app/internal/handler/friend"
-	users "github.com/wuyan94zl/go-zero-blog/app/internal/handler/users"
-	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
+	friend "github.com/wuyan94zl/IM/app/internal/handler/friend"
+	users "github.com/wuyan94zl/IM/app/internal/handler/users"
+	"github.com/wuyan94zl/IM/app/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
