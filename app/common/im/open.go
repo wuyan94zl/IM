@@ -1,6 +1,6 @@
 package im
 
-import "github.com/wuyan94zl/chart"
+import "github.com/wuyan94zl/chat"
 
 func JoinChannelIds(uid uint64, channelIds ...string) {
 	chart.JoinChannelIds(uid, channelIds...)

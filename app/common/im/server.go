@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wuyan94zl/chart"
+	"github.com/wuyan94zl/chat"
 	"github.com/wuyan94zl/go-zero-blog/app/internal/svc"
 	"github.com/wuyan94zl/go-zero-blog/app/models/hasusers"
 	"github.com/wuyan94zl/go-zero-blog/app/models/messages"
