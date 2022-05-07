@@ -1,0 +1,81 @@
+syntax = "v1"
+
+type GroupRequest {
+}
+type GroupResponse {
+}
+
+type GroupAddRequest {
+    Title string `json:"title"`
+    Description string `json:"description"`
+}
+
+type GroupEditRequest {
+    GroupId int64 `json:"group_id"`
+    Title string `json:"title"`
+    Description string `json:"description"`
+}
+
+type GroupDelRequest {
+    GroupId int64 `json:"group_id"`
+}
+
+type GroupJoinRequest {
+    GroupId int64 `json:"group_id"`
+    Note string `json:"note"`
+}
+
+type GroupOutRequest {
+    GroupId int64 `json:"group_id"`
+}
+
+type GroupRemoveRequest {
+    GroupId int64 `json:"group_id"`
+    UserId int64 `json:"user_id"`
+}
+
+type GroupJoinHandleRequest {
+    JoinId int64 `json:"join_id"`
+}
+
+type Group {
+    Id int64 `json:"id"`
+    Title string `json:"title"`
+    Description string `json:"description"`
+}
+
+type GroupListResponse {
+    List []Group `json:"list"`
+}
+
+
+@server(
+    group: group
+    jwt: JwtAuth
+    middleware: AuthToken
+)
+service app-api {
+    @handler GroupAdd
+    post /group/add (GroupAddRequest) returns (GroupResponse)
+
+    @handler GroupEdit
+    post /group/edit (GroupEditRequest) returns (GroupResponse)
+
+    @handler GroupDel
+    post /group/Del (GroupDelRequest) returns (GroupResponse)
+
+    @handler GroupJoin
+    post /group/join (GroupJoinRequest) returns (GroupResponse)
+
+    @handler GroupOut
+    post /group/out (GroupOutRequest) returns (GroupResponse)
+
+    @handler GroupJoinHandle
+    post /group/join/handle (GroupJoinHandleRequest) returns (GroupResponse)
+
+    @handler GroupRemove
+    post /group/remove (GroupJoinHandleRequest) returns (GroupResponse)
+
+    @handler GroupList
+    post /group/list (GroupRequest) returns (GroupListResponse)
+}

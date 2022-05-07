@@ -20,3 +20,8 @@ DB:
 Cache:
   - Host: localhost:6379
     Pass: "123456"
+
+# Log
+Log:
+  ServiceName: chat-api
+  Level: error

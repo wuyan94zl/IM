@@ -26,7 +26,7 @@ func NewUserRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *User
 	}
 }
 
-func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*utils2.SuccessTmp, *utils2.ErrorTmp) {
+func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*types.JwtTokenResponse, error) {
 	// 验证用户是否存在
 	_, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err == nil {
@@ -51,10 +51,10 @@ func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*utils2.Su
 	info["id"] = id
 	info["nick_name"] = req.NickName
 	token, err := genToken(now, l.svcCtx.Config.JwtAuth.AccessSecret, info, accessExpire)
-	return utils2.Success(types.JwtTokenResponse{
+	return &types.JwtTokenResponse{
 		AccessToken:  token,
 		AccessExpire: now + accessExpire,
 		RefreshAfter: now + accessExpire/2,
-	}), nil
+	}, nil
 
 }

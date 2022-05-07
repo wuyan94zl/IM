@@ -27,7 +27,7 @@ func NewUserLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserLog
 	}
 }
 
-func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*utils2.SuccessTmp, *utils2.ErrorTmp) {
+func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*types.JwtTokenResponse, error) {
 	info, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err != nil {
 		if err == user.ErrNotFound {
@@ -45,12 +45,12 @@ func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*utils2.SuccessTmp,
 	data["id"] = info.Id
 	data["nick_name"] = info.NickName
 	token, err := genToken(now, l.svcCtx.Config.JwtAuth.AccessSecret, data, accessExpire)
-	return utils2.Success(types.JwtTokenResponse{
+	return &types.JwtTokenResponse{
 		AccessToken:  token,
 		AccessExpire: now + accessExpire,
 		RefreshAfter: now + accessExpire/2,
 		WsToken:      info.Id,
-	}), nil
+	}, nil
 }
 
 func genToken(iat int64, secretKey string, payloads map[string]interface{}, seconds int64) (string, error) {

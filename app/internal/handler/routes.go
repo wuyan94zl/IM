@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	friend "github.com/wuyan94zl/IM/app/internal/handler/friend"
+	group "github.com/wuyan94zl/IM/app/internal/handler/group"
 	users "github.com/wuyan94zl/IM/app/internal/handler/users"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 
@@ -88,6 +89,55 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPost,
 					Path:    "/notice/list",
 					Handler: friend.NoticeListHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.JwtAuth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthToken},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/add",
+					Handler: group.GroupAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/edit",
+					Handler: group.GroupEditHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/Del",
+					Handler: group.GroupDelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/join",
+					Handler: group.GroupJoinHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/out",
+					Handler: group.GroupOutHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/join/handle",
+					Handler: group.GroupJoinHandleHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/remove",
+					Handler: group.GroupRemoveHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/group/list",
+					Handler: group.GroupListHandler(serverCtx),
 				},
 			}...,
 		),

@@ -1,10 +1,9 @@
 package users
 
 import (
-	"fmt"
 	"context"
 	"encoding/json"
-	"github.com/wuyan94zl/IM/app/common/utils"
+	"fmt"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
 
@@ -25,7 +24,7 @@ func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfo
 	}
 }
 
-func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (*utils.SuccessTmp, *utils.ErrorTmp) {
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (*types.UserInfoResponse, error) {
 	// id 为啥是json.Number
 	id, _ := l.ctx.Value("id").(json.Number).Int64()
 	// nick_name string
@@ -33,5 +32,10 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (*utils.SuccessTmp,
 	// l.ctx.Value("key") key为token解析的map key
 	fmt.Println(id)
 	info, _ := l.svcCtx.UserModel.FindOne(l.ctx, id)
-	return utils.Success(info), nil
+	return &types.UserInfoResponse{
+		Id:       info.Id,
+		UserName: info.UserName,
+		NickName: info.NickName,
+		Mobile:   info.Mobile,
+	}, nil
 }
