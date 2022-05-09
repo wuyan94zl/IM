@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/wuyan94zl/IM/app/common/im"
-	"github.com/wuyan94zl/IM/app/models/notices"
-	"strconv"
-
+	"github.com/wuyan94zl/IM/app/common/response"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
+	"github.com/wuyan94zl/IM/app/models/notices"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,30 +26,28 @@ func NewFriendDelLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FriendD
 	}
 }
 
-func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.FriendResponse, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+func (l *FriendDelLogic) FriendDel(req *types.FriendRequest) (resp *types.Response, err error) {
+	id := l.svcCtx.AuthUser.Id
 
 	friend, err := l.svcCtx.UserUsersModel.CheckFriend(id, req.FriendId)
-	if len(friend) != 2 || err != nil {
-		return &types.FriendResponse{
-			Status:  false,
-			Message: "对方不是你的好友",
-		}, nil
+	if friend == nil {
+		return nil, response.Error(500, "对方不是你的好友")
 	}
-
-	err = l.svcCtx.UserUsersModel.Delete(l.ctx, friend[0].Id)
-	err = l.svcCtx.UserUsersModel.Delete(l.ctx, friend[1].Id)
-	l.svcCtx.NoticeModel.Insert(l.ctx, &notices.Notices{PubUserId: id, SubUserId: req.FriendId, Content: "把删除从ta的好友移除", Status: 1, Tp: 2})
+	_, err = l.svcCtx.UserUsersModel.DeleteFriendByChannelId(im.GenChannelIdByFriend(id, req.FriendId))
 	if err != nil {
-		return &types.FriendResponse{
-			Status:  false,
-			Message: "删除好友失败",
-		}, nil
+		return nil, response.Error(500, "删除好友失败"+err.Error())
 	}
-
-	go im.SendMessageToChannelIds(uint64(id), strconv.FormatInt(req.FriendId, 10), 202, im.GenChannelIdByFriend(id, req.FriendId))
-	return &types.FriendResponse{
-		Status:  true,
+	notice := notices.Notices{
+		PubUserId: id,
+		SubUserId: req.FriendId,
+		Content:   l.svcCtx.AuthUser.NickName + " 把您从ta的好友列表中移除",
+		Status:    1,
+		Tp:        notices.FRIEND,
+	}
+	l.svcCtx.NoticeModel.Insert(l.ctx, &notice)
+	strByte, _ := json.Marshal(notice)
+	go im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte), 201)
+	return &types.Response{
 		Message: "删除好友成功",
 	}, nil
 }

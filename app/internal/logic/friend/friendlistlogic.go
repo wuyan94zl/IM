@@ -2,7 +2,6 @@ package friend
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/wuyan94zl/IM/app/common/im"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
@@ -25,12 +24,12 @@ func NewFriendListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Friend
 }
 
 func (l *FriendListLogic) FriendList() (resp *types.FriendList, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	id := l.svcCtx.AuthUser.Id
 
 	friends, err := l.svcCtx.UserModel.Friends(l.svcCtx.UserUsersModel, id)
 	list := new(types.FriendList)
 	for _, friend := range friends {
-		list.List = append(list.List, types.Friend{UserId: friend.Id, NickName: friend.NickName, IsFriend: 1,ChannelId: im.GenChannelIdByFriend(id,friend.Id)})
+		list.List = append(list.List, types.Friend{UserId: friend.Id, NickName: friend.NickName, IsFriend: 1, ChannelId: im.GenChannelIdByFriend(id, friend.Id)})
 	}
 	return list, nil
 }

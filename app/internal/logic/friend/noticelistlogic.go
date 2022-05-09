@@ -2,8 +2,6 @@ package friend
 
 import (
 	"context"
-	"encoding/json"
-
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
 
@@ -25,7 +23,7 @@ func NewNoticeListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Notice
 }
 
 func (l *NoticeListLogic) NoticeList() (resp *types.NoticeListResponse, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	id := l.svcCtx.AuthUser.Id
 	notice, err := l.svcCtx.NoticeModel.GetListByUserId(id)
 	if err != nil {
 		return nil, err

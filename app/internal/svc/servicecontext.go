@@ -44,7 +44,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		AuthToken:      middleware.NewAuthTokenMiddleware(c, authUser, redisCli).Handle,
 		AuthUser:       authUser,
 		UserModel:      user.NewUsersModel(sqlx.NewMysql(c.DB.DataSource), c.Cache),
-		UserUsersModel: hasusers.NewUserUsersModel(sqlx.NewMysql(c.DB.DataSource), c.Cache),
+		UserUsersModel: hasusers.NewUserUsersModel(sqlx.NewMysql(c.DB.DataSource)),
 		NoticeModel:    notices.NewNoticesModel(sqlx.NewMysql(c.DB.DataSource)),
 		MessageModel:   messages.NewMessagesModel(sqlx.NewMysql(c.DB.DataSource)),
 		SendQueueModel: sendqueue.NewSendQueuesModel(sqlx.NewMysql(c.DB.DataSource)),

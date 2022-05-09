@@ -6,7 +6,5 @@ import "message.api"
 import "group.api"
 
 type Response {
-	Code    int         `json:"code"`
-	Data    interface{} `json:"data"`
 	Message interface{} `json:"message"`
 }

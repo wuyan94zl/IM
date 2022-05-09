@@ -7,6 +7,7 @@ import (
 	"github.com/wuyan94zl/IM/app/models/groups"
 	"github.com/wuyan94zl/IM/app/models/groupusers"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"time"
 
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
@@ -30,9 +31,10 @@ func NewGroupAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GroupAdd
 
 func (l *GroupAddLogic) GroupAdd(req *types.GroupAddRequest) (resp *types.Response, err error) {
 	groupItem := groups.Groups{
+		UserId:      l.svcCtx.AuthUser.Id,
 		Title:       req.Title,
 		Description: req.Description,
-		ChannelId:   utils.Md5ByString(fmt.Sprintf("%s%s", req.Title, req.Description)),
+		ChannelId:   utils.Md5ByString(fmt.Sprintf("%s%s%d", req.Title, req.Description, time.Now().UnixNano())),
 	}
 	err = l.svcCtx.MysqlConn.TransactCtx(l.ctx, func(ctx context.Context, session sqlx.Session) error {
 		err := l.svcCtx.GroupModel.TranCreate(ctx, session, &groupItem)

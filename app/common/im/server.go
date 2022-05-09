@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wuyan94zl/chat"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/models/hasusers"
 	"github.com/wuyan94zl/IM/app/models/messages"
 	"github.com/wuyan94zl/IM/app/models/sendqueue"
+	"github.com/wuyan94zl/chat"
 	"net/http"
 	"strconv"
 	"time"
@@ -87,14 +87,26 @@ func (d *data) SendMessage(msg chart.Message) {
 }
 
 func (d *data) DelaySendMessage(channelId string, msg chart.Message, sent []uint64) {
-	var users []hasusers.UserUsers
-	var err error
-	if channelId == "" {
-		users = append(users, hasusers.UserUsers{UserId: int64(msg.ToUserId)})
-	} else {
-		users, err = d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
-		if err != nil {
-			return
+	fmt.Println("delay：", channelId, msg, sent)
+	var ids []int64
+	switch msg.Type {
+	case 101:
+		users, _ := d.ctx.GroupUserModel.FindUsersByChannelId(channelId)
+		for _, u := range users {
+			ids = append(ids, u.UserId)
+		}
+	case 100:
+		var users []hasusers.UserUsers
+		if channelId == "" {
+			ids = append(ids, int64(msg.ToUserId))
+		} else {
+			if len(sent) == 2 {// 单聊发送人数为2，则无离线消息 return
+				return
+			}
+			users, _ = d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
+			for _, u := range users {
+				ids = append(ids, u.UserId)
+			}
 		}
 	}
 
@@ -106,19 +118,24 @@ func (d *data) DelaySendMessage(channelId string, msg chart.Message, sent []uint
 	if err != nil {
 		return
 	}
-	for _, user := range users {
-		if _, ok := sentMap[user.UserId]; !ok {
-			d.ctx.SendQueueModel.Insert(context.Background(), &sendqueue.SendQueues{UserId: user.UserId, Message: string(msgByte), SendUserId: int64(msg.UserId)})
+	for _, uid := range ids {
+		if _, ok := sentMap[uid]; !ok {
+			d.ctx.SendQueueModel.Insert(context.Background(), &sendqueue.SendQueues{UserId: uid, Message: string(msgByte), SendUserId: int64(msg.UserId)})
 		}
 	}
 }
 
 // LoginServer 登录成功后回调
 func (d *data) LoginServer(uid uint64) {
-	list, _ := d.ctx.UserModel.Friends(d.ctx.UserUsersModel, int64(uid))
+	//list, _ := d.ctx.UserModel.Friends(d.ctx.UserUsersModel, int64(uid))
+	list, _ := d.ctx.UserUsersModel.Friends(int64(uid))
 	var channelIds []string
 	for _, v := range list {
-		channelIds = append(channelIds, GenChannelIdByFriend(int64(uid), v.Id))
+		channelIds = append(channelIds, GenChannelIdByFriend(int64(uid), v.HasUserId))
+	}
+	groups, _ := d.ctx.GroupUserModel.InGroups(context.Background(), int64(uid))
+	for _, v := range groups {
+		channelIds = append(channelIds, v.ChannelId)
 	}
 	chart.JoinChannelIds(uid, channelIds...)
 	go func() {

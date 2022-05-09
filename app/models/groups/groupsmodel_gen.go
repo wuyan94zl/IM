@@ -37,6 +37,7 @@ type (
 
 	Groups struct {
 		Id          int64     `db:"id"`
+		UserId      int64     `db:"user_id"`
 		Title       string    `db:"title"`
 		Description string    `db:"description"`
 		ChannelId   string    `db:"channel_id"`
@@ -53,8 +54,8 @@ func newGroupsModel(conn sqlx.SqlConn) *defaultGroupsModel {
 }
 
 func (m *defaultGroupsModel) Insert(ctx context.Context, data *Groups) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, groupsRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Title, data.Description, data.ChannelId)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, groupsRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.UserId, data.Title, data.Description, data.ChannelId)
 	return ret, err
 }
 
@@ -74,7 +75,7 @@ func (m *defaultGroupsModel) FindOne(ctx context.Context, id int64) (*Groups, er
 
 func (m *defaultGroupsModel) Update(ctx context.Context, data *Groups) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, groupsRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Title, data.Description, data.ChannelId, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.UserId, data.Title, data.Description, data.ChannelId, data.Id)
 	return err
 }
 

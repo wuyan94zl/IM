@@ -24,5 +24,5 @@ Cache:
 # Log
 Log:
   ServiceName: chat-api
-  Level: error
+  #Level: error
   Encoding: plain

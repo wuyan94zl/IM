@@ -42,6 +42,7 @@ type (
 		SubUserId  int64     `db:"sub_user_id"`
 		LinkId     int64     `db:"link_id"`
 		Content    string    `db:"content"`
+		Note       string    `db:"Note"`
 		IsAgree    string    `db:"is_agree"`
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
@@ -57,8 +58,8 @@ func newNoticesModel(conn sqlx.SqlConn) *defaultNoticesModel {
 }
 
 func (m *defaultNoticesModel) Insert(ctx context.Context, data *Notices) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, noticesRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Tp, data.PubUserId, data.SubUserId, data.LinkId, data.Content, data.IsAgree, data.Status)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, noticesRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Tp, data.PubUserId, data.SubUserId, data.LinkId, data.Content, data.Note, data.IsAgree, data.Status)
 	return ret, err
 }
 
@@ -78,7 +79,7 @@ func (m *defaultNoticesModel) FindOne(ctx context.Context, id int64) (*Notices, 
 
 func (m *defaultNoticesModel) Update(ctx context.Context, data *Notices) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, noticesRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Tp, data.PubUserId, data.SubUserId, data.LinkId, data.Content, data.IsAgree, data.Status, data.Id)
+	_, err := m.conn.ExecCtx(ctx, query, data.Tp, data.PubUserId, data.SubUserId, data.LinkId, data.Content, data.Note, data.IsAgree, data.Status, data.Id)
 	return err
 }
 

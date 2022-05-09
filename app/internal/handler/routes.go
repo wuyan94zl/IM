@@ -111,7 +111,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
-					Path:    "/group/Del",
+					Path:    "/group/del",
 					Handler: group.GroupDelHandler(serverCtx),
 				},
 				{

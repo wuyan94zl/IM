@@ -27,10 +27,10 @@ func NewFriendAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FriendA
 }
 
 func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.FriendResponse, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	id := l.svcCtx.AuthUser.Id
 
-	isFriend, err := l.svcCtx.UserUsersModel.CheckFriend(id, req.FriendId)
-	if len(isFriend) == 2 || err != nil {
+	friend, err := l.svcCtx.UserUsersModel.CheckFriend(id, req.FriendId)
+	if friend != nil {
 		return &types.FriendResponse{
 			Status:  false,
 			Message: "对方已经是你好友",
@@ -44,12 +44,18 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 		}, nil
 	}
 
-	user, _ := l.svcCtx.UserModel.FindOne(l.ctx, id)
-	noticeAdd := notices.Notices{PubUserId: id, SubUserId: req.FriendId, Tp: 1, Content: fmt.Sprintf("%s 请求添加您为好友", user.NickName), CreateTime: time.Now()}
-	insert, _ := l.svcCtx.NoticeModel.Insert(l.ctx, &noticeAdd)
-	noticeAdd.Id, err = insert.LastInsertId()
+	noticeAdd := notices.Notices{
+		PubUserId:  id,
+		SubUserId:  req.FriendId,
+		Tp:         notices.FRIEND,
+		Content:    fmt.Sprintf("%s 请求添加您为好友", l.svcCtx.AuthUser.NickName),
+		Note:       "",
+		CreateTime: time.Now(),
+	}
+	insert, err := l.svcCtx.NoticeModel.Insert(l.ctx, &noticeAdd)
 	switch err {
 	case nil:
+		noticeAdd.Id, _ = insert.LastInsertId()
 		strByte, _ := json.Marshal(noticeAdd)
 		go im.SendMessageToUid(uint64(id), uint64(req.FriendId), string(strByte), 200)
 		return &types.FriendResponse{
@@ -57,9 +63,6 @@ func (l *FriendAddLogic) FriendAdd(req *types.FriendRequest) (resp *types.Friend
 			Message: "添加好友请求已发送",
 		}, nil
 	default:
-		return &types.FriendResponse{
-			Status:  false,
-			Message: err.Error(),
-		}, nil
+		return nil, err
 	}
 }

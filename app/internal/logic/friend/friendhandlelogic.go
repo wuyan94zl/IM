@@ -29,7 +29,7 @@ func NewFriendHandleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Frie
 }
 
 func (l *FriendHandleLogic) FriendHandle(req *types.FriendHandleRequest) (resp *types.FriendResponse, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	id := l.svcCtx.AuthUser.Id
 	log, err := l.svcCtx.NoticeModel.FindOne(l.ctx, req.ActionLogId)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (l *FriendHandleLogic) FriendHandle(req *types.FriendHandleRequest) (resp *
 	}
 
 	friend, err := l.svcCtx.UserUsersModel.CheckFriend(log.PubUserId, log.SubUserId)
-	if len(friend) > 0 || err != nil {
+	if friend != nil {
 		return &types.FriendResponse{Status: false, Message: "已添加完成"}, nil
 	}
 	log.Status = 1
@@ -65,8 +65,15 @@ func (l *FriendHandleLogic) setFriend(log *notices.Notices, tp, id int64) (resp 
 	}
 	l.svcCtx.NoticeModel.Update(l.ctx, log)
 
-	nickName := l.ctx.Value("nick_name")
-	handleNotice := notices.Notices{PubUserId: id, SubUserId: log.PubUserId, Tp: tp, Content: fmt.Sprintf("%v %s 你的添加好友请求", nickName, log.IsAgree), IsAgree: log.IsAgree, Status: 1, CreateTime: time.Now()}
+	handleNotice := notices.Notices{
+		PubUserId:  id,
+		SubUserId:  log.PubUserId,
+		Tp:         notices.FRIEND,
+		Content:    fmt.Sprintf("%v %s 你的添加好友请求", l.svcCtx.AuthUser.NickName, log.IsAgree),
+		IsAgree:    log.IsAgree,
+		Status:     1,
+		CreateTime: time.Now(),
+	}
 	noticeIns, _ := l.svcCtx.NoticeModel.Insert(l.ctx, &handleNotice)
 	insertId, _ := noticeIns.LastInsertId()
 	handleNotice.Id = insertId
@@ -77,6 +84,6 @@ func (l *FriendHandleLogic) setFriend(log *notices.Notices, tp, id int64) (resp 
 		go im.JoinChannelIds(uint64(log.PubUserId), channelId)
 	}
 	strByte, _ := json.Marshal(handleNotice)
-	go im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), 200)
+	go im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), 201)
 	return rlt, nil
 }

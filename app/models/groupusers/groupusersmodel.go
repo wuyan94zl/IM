@@ -14,6 +14,10 @@ type (
 	GroupUsersModel interface {
 		groupUsersModel
 		TranCreate(ctx context.Context, session sqlx.Session, groupUserItem *GroupUsers) error
+		TranDeleteByGroupId(ctx context.Context, session sqlx.Session, groupId int64) error
+		IsInGroup(ctx context.Context, id, userId int64) error
+		InGroups(ctx context.Context, id int64) ([]GroupUsers, error)
+		FindUsersByChannelId(channelId string) ([]GroupUsers, error)
 	}
 
 	customGroupUsersModel struct {
@@ -28,11 +32,47 @@ func NewGroupUsersModel(conn sqlx.SqlConn) GroupUsersModel {
 	}
 }
 
-func (m *defaultGroupUsersModel) TranCreate(ctx context.Context, session sqlx.Session, data *GroupUsers) error {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, groupUsersRowsExpectAutoSet)
+func (c *customGroupUsersModel) TranCreate(ctx context.Context, session sqlx.Session, data *GroupUsers) error {
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", c.table, groupUsersRowsExpectAutoSet)
 	_, err := session.ExecCtx(ctx, query, data.GroupId, data.UserId, data.ChannelId, data.IsManager)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *customGroupUsersModel) TranDeleteByGroupId(ctx context.Context, session sqlx.Session, groupId int64) error {
+	query := fmt.Sprintf("delete from %s where `group_id` = ?", c.table)
+	_, err := session.ExecCtx(ctx, query, groupId)
+	return err
+}
+
+func (c *customGroupUsersModel) IsInGroup(ctx context.Context, id, userId int64) error {
+	query := fmt.Sprintf("select %s from %s where `group_id` = ? and user_id = ?", groupUsersRows, c.table)
+	var u GroupUsers
+	err := c.conn.QueryRowCtx(ctx, &u, query, id, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *customGroupUsersModel) InGroups(ctx context.Context, id int64) ([]GroupUsers, error) {
+	query := fmt.Sprintf("select %s from %s where user_id = ?", groupUsersRows, c.table)
+	var u []GroupUsers
+	err := c.conn.QueryRowsCtx(ctx, &u, query, id)
+	if err == nil {
+		return u, nil
+	}
+	return nil, err
+}
+
+func (c *customGroupUsersModel) FindUsersByChannelId(channelId string) ([]GroupUsers, error) {
+	query := fmt.Sprintf("select %s from %s where channel_id = ?", groupUsersRows, c.table)
+	var u []GroupUsers
+	err := c.conn.QueryRowsCtx(context.Background(), &u, query, channelId)
+	if err == nil {
+		return u, nil
+	}
+	return nil, err
 }

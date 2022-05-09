@@ -3,7 +3,9 @@ package groups
 import (
 	"context"
 	"fmt"
+	"github.com/wuyan94zl/IM/app/common/response"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"strings"
 )
 
 var _ GroupsModel = (*customGroupsModel)(nil)
@@ -14,6 +16,8 @@ type (
 	GroupsModel interface {
 		groupsModel
 		TranCreate(ctx context.Context, session sqlx.Session, groupItem *Groups) error
+		TranDelete(ctx context.Context, session sqlx.Session, groupId int64) error
+		FindByIds(id ...interface{}) (map[int64]Groups, error)
 	}
 
 	customGroupsModel struct {
@@ -41,10 +45,10 @@ func (m *defaultGroupsModel) FindByTitle(ctx context.Context, title string) (*Gr
 func (m *defaultGroupsModel) TranCreate(ctx context.Context, session sqlx.Session, groupItem *Groups) error {
 	_, err := m.FindByTitle(ctx, groupItem.Title)
 	if err == nil {
-		return fmt.Errorf("群组名称已存在")
+		return response.Error(1000, "群组名称已存在")
 	}
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, groupsRowsExpectAutoSet)
-	execCtx, err := session.ExecCtx(ctx, query, groupItem.Title, groupItem.Description, groupItem.ChannelId)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, groupsRowsExpectAutoSet)
+	execCtx, err := session.ExecCtx(ctx, query, groupItem.UserId, groupItem.Title, groupItem.Description, groupItem.ChannelId)
 	if err != nil {
 		return err
 	}
@@ -54,4 +58,29 @@ func (m *defaultGroupsModel) TranCreate(ctx context.Context, session sqlx.Sessio
 	}
 	groupItem.Id = id
 	return nil
+}
+
+func (m *defaultGroupsModel) TranDelete(ctx context.Context, session sqlx.Session, groupId int64) error {
+	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+	_, err := session.ExecCtx(ctx, query, groupId)
+	return err
+}
+
+func (m *defaultGroupsModel) FindByIds(id ...interface{}) (map[int64]Groups, error) {
+	if len(id) < 1 {
+		return nil, fmt.Errorf("参数错误")
+	}
+	idStr := strings.Repeat(",?", len(id))
+	query := fmt.Sprintf("select %s from %s where `id` in (%s)", groupsRows, m.table, idStr[1:])
+	var resp []Groups
+	rlt := make(map[int64]Groups)
+	err := m.conn.QueryRows(&resp, query, id...)
+	if err != nil {
+		return nil, err
+	} else {
+		for _, v := range resp {
+			rlt[v.Id] = v
+		}
+		return rlt, nil
+	}
 }

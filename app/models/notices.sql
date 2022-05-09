@@ -6,6 +6,7 @@ CREATE TABLE notices
     sub_user_id INT          NOT NULL,
     link_id     INT          NOT NULL,
     content     varchar(100) NOt NULL,
+    Note        varchar(100) NOt NULL DEFAULT '',
     is_agree    varchar(100) NOt NULL,
     create_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

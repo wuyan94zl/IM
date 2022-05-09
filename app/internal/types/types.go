@@ -2,8 +2,6 @@
 package types
 
 type Response struct {
-	Code    int         `json:"code"`
-	Data    interface{} `json:"data"`
 	Message interface{} `json:"message"`
 }
 
@@ -155,6 +153,8 @@ type Group struct {
 	Id          int64  `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	ChannelId   string `json:"channel_id"`
+	IsManager   int64  `json:"is_manager"`
 }
 
 type GroupListResponse struct {

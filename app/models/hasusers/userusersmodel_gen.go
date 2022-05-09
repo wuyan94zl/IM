@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/zeromicro/go-zero/core/stores/builder"
-	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/core/stringx"
@@ -20,8 +19,6 @@ var (
 	userUsersRows                = strings.Join(userUsersFieldNames, ",")
 	userUsersRowsExpectAutoSet   = strings.Join(stringx.Remove(userUsersFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
 	userUsersRowsWithPlaceHolder = strings.Join(stringx.Remove(userUsersFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
-
-	cacheUserUsersIdPrefix = "cache:userUsers:id:"
 )
 
 type (
@@ -33,7 +30,7 @@ type (
 	}
 
 	defaultUserUsersModel struct {
-		sqlc.CachedConn
+		conn  sqlx.SqlConn
 		table string
 	}
 
@@ -45,29 +42,23 @@ type (
 	}
 )
 
-func newUserUsersModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultUserUsersModel {
+func newUserUsersModel(conn sqlx.SqlConn) *defaultUserUsersModel {
 	return &defaultUserUsersModel{
-		CachedConn: sqlc.NewConn(conn, c),
-		table:      "`user_users`",
+		conn:  conn,
+		table: "`user_users`",
 	}
 }
 
 func (m *defaultUserUsersModel) Insert(ctx context.Context, data *UserUsers) (sql.Result, error) {
-	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, data.Id)
-	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, userUsersRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId)
-	}, userUsersIdKey)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, userUsersRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId)
 	return ret, err
 }
 
 func (m *defaultUserUsersModel) FindOne(ctx context.Context, id int64) (*UserUsers, error) {
-	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, id)
+	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userUsersRows, m.table)
 	var resp UserUsers
-	err := m.QueryRowCtx(ctx, &resp, userUsersIdKey, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) error {
-		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userUsersRows, m.table)
-		return conn.QueryRowCtx(ctx, v, query, id)
-	})
+	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
 	switch err {
 	case nil:
 		return &resp, nil
@@ -79,30 +70,15 @@ func (m *defaultUserUsersModel) FindOne(ctx context.Context, id int64) (*UserUse
 }
 
 func (m *defaultUserUsersModel) Update(ctx context.Context, data *UserUsers) error {
-	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, data.Id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userUsersRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId, data.Id)
-	}, userUsersIdKey)
+	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, userUsersRowsWithPlaceHolder)
+	_, err := m.conn.ExecCtx(ctx, query, data.UserId, data.HasUserId, data.ChannelId, data.Id)
 	return err
 }
 
 func (m *defaultUserUsersModel) Delete(ctx context.Context, id int64) error {
-	userUsersIdKey := fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
-		return conn.ExecCtx(ctx, query, id)
-	}, userUsersIdKey)
+	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+	_, err := m.conn.ExecCtx(ctx, query, id)
 	return err
-}
-
-func (m *defaultUserUsersModel) formatPrimary(primary interface{}) string {
-	return fmt.Sprintf("%s%v", cacheUserUsersIdPrefix, primary)
-}
-
-func (m *defaultUserUsersModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn, v, primary interface{}) error {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", userUsersRows, m.table)
-	return conn.QueryRowCtx(ctx, v, query, primary)
 }
 
 func (m *defaultUserUsersModel) tableName() string {

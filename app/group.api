@@ -2,7 +2,8 @@ syntax = "v1"
 
 type GroupRequest {
 }
-type GroupResponse {
+type Response {
+    Message string `json:"message"`
 }
 
 type GroupAddRequest {
@@ -56,25 +57,25 @@ type GroupListResponse {
 )
 service app-api {
     @handler GroupAdd
-    post /group/add (GroupAddRequest) returns (GroupResponse)
+    post /group/add (GroupAddRequest) returns (Response)
 
     @handler GroupEdit
-    post /group/edit (GroupEditRequest) returns (GroupResponse)
+    post /group/edit (GroupEditRequest) returns (Response)
 
     @handler GroupDel
-    post /group/Del (GroupDelRequest) returns (GroupResponse)
+    post /group/del (GroupDelRequest) returns (Response)
 
     @handler GroupJoin
-    post /group/join (GroupJoinRequest) returns (GroupResponse)
+    post /group/join (GroupJoinRequest) returns (Response)
 
     @handler GroupOut
-    post /group/out (GroupOutRequest) returns (GroupResponse)
+    post /group/out (GroupOutRequest) returns (Response)
 
     @handler GroupJoinHandle
-    post /group/join/handle (GroupJoinHandleRequest) returns (GroupResponse)
+    post /group/join/handle (GroupJoinHandleRequest) returns (Response)
 
     @handler GroupRemove
-    post /group/remove (GroupJoinHandleRequest) returns (GroupResponse)
+    post /group/remove (GroupJoinHandleRequest) returns (Response)
 
     @handler GroupList
     post /group/list (GroupRequest) returns (GroupListResponse)

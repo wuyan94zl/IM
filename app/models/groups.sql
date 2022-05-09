@@ -1,6 +1,7 @@
 CREATE TABLE groups
 (
     id          INT auto_increment NOT NULL,
+    user_id     INT          NOt NULL,
     title       varchar(100) NOt NULL,
     description varchar(255) NOt NULL,
     channel_id  char(32)     NOT NULL,
