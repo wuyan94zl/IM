@@ -23,7 +23,7 @@ func NewGroupOutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GroupOut
 	}
 }
 
-func (l *GroupOutLogic) GroupOut(req *types.GroupOutRequest) (resp *types.GroupResponse, err error) {
+func (l *GroupOutLogic) GroupOut(req *types.GroupOutRequest) (resp *types.Response, err error) {
 	// todo: add your logic here and delete this line
 
 	return

@@ -18,6 +18,7 @@ type (
 		TranCreate(ctx context.Context, session sqlx.Session, groupItem *Groups) error
 		TranDelete(ctx context.Context, session sqlx.Session, groupId int64) error
 		FindByIds(id ...interface{}) (map[int64]Groups, error)
+		FindByTitle(ctx context.Context, title string) (*Groups, error)
 	}
 
 	customGroupsModel struct {

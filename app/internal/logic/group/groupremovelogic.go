@@ -23,7 +23,7 @@ func NewGroupRemoveLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Group
 	}
 }
 
-func (l *GroupRemoveLogic) GroupRemove(req *types.GroupJoinHandleRequest) (resp *types.GroupResponse, err error) {
+func (l *GroupRemoveLogic) GroupRemove(req *types.GroupJoinHandleRequest) (resp *types.Response, err error) {
 	// todo: add your logic here and delete this line
 
 	return

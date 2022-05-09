@@ -101,6 +101,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
+					Path:    "/group/search",
+					Handler: group.GroupSreachHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/group/add",
 					Handler: group.GroupAddHandler(serverCtx),
 				},

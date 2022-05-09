@@ -37,18 +37,31 @@ type GroupRemoveRequest {
 
 type GroupJoinHandleRequest {
     JoinId int64 `json:"join_id"`
+    ActionType int64 `json:"action_type"`
 }
 
 type Group {
     Id int64 `json:"id"`
     Title string `json:"title"`
     Description string `json:"description"`
+    ChannelId string `json:"channel_id"`
+    IsManager int64 `json:"is_manager"`
 }
 
 type GroupListResponse {
     List []Group `json:"list"`
 }
+type GroupSreachRequest {
+    Title string `json:"title"`
+}
 
+type GroupSreachResponse {
+    Id int64 `json:"id"`
+    Title string `json:"title"`
+    Description string `json:"description"`
+    IsJoin int64 `json:"is_join"`
+    Manager string `json:"manager"`
+}
 
 @server(
     group: group
@@ -56,6 +69,9 @@ type GroupListResponse {
     middleware: AuthToken
 )
 service app-api {
+    @handler GroupSreach
+    post /group/search (GroupSreachRequest) returns (GroupSreachResponse)
+
     @handler GroupAdd
     post /group/add (GroupAddRequest) returns (Response)
 

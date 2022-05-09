@@ -59,6 +59,7 @@ func (l *FriendHandleLogic) setFriend(log *notices.Notices, tp, id int64) (resp 
 		rlt.Status = true
 		rlt.Message = "添加成功"
 	} else {
+		tp = 0
 		log.IsAgree = "已拒绝"
 		rlt.Status = false
 		rlt.Message = "拒绝添加好友"
@@ -84,6 +85,6 @@ func (l *FriendHandleLogic) setFriend(log *notices.Notices, tp, id int64) (resp 
 		go im.JoinChannelIds(uint64(log.PubUserId), channelId)
 	}
 	strByte, _ := json.Marshal(handleNotice)
-	go im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), 201)
+	go im.SendMessageToUid(uint64(id), uint64(handleNotice.SubUserId), string(strByte), uint8(200+tp))
 	return rlt, nil
 }

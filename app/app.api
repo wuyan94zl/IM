@@ -4,7 +4,3 @@ import "user.api"
 import "friend.api"
 import "message.api"
 import "group.api"
-
-type Response {
-	Message interface{} `json:"message"`
-}
