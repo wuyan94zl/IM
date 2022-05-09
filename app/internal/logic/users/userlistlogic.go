@@ -2,8 +2,6 @@ package users
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
 	"github.com/wuyan94zl/IM/app/models/user"
@@ -25,7 +23,7 @@ func NewUserListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserList
 }
 
 func (l *UserListLogic) UserList(req *types.UserListRequest) (resp *types.UserListResponse, err error) {
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+	id := l.svcCtx.AuthUser.Id
 	list, err := l.svcCtx.UserModel.GetListByKeyword(req.Keyword, id)
 
 	if err != nil {
@@ -50,7 +48,6 @@ func (l *UserListLogic) isFriend(list []user.Users, userId int64) map[int64]bool
 		id = append(id, v.Id)
 	}
 	friend, err := l.svcCtx.UserUsersModel.IsFriend(userId, id...)
-	fmt.Println(friend)
 	if err != nil {
 		return isFriend
 	}

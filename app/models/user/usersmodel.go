@@ -7,6 +7,7 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"strings"
 )
 
 var _ UsersModel = (*customUsersModel)(nil)
@@ -16,6 +17,7 @@ type (
 	// and implement the added methods in customUsersModel.
 	UsersModel interface {
 		usersModel
+		FindByIds(ctx context.Context, ids ...interface{}) (map[int64]Users, error)
 		FindRawByName(ctx context.Context, userName string) (*Users, error)
 		Friends(hasUserModel hasusers.UserUsersModel, userId int64) ([]Users, error)
 		GetListByKeyword(keyword string, id int64) ([]Users, error)
@@ -31,6 +33,28 @@ type (
 func NewUsersModel(conn sqlx.SqlConn, c cache.CacheConf) UsersModel {
 	return &customUsersModel{
 		defaultUsersModel: newUsersModel(conn, c),
+	}
+}
+
+func (m *customUsersModel) FindByIds(ctx context.Context, ids ...interface{}) (map[int64]Users, error) {
+	if len(ids) < 1 {
+		return nil, fmt.Errorf("参数ids必传")
+	}
+	mapList := make(map[int64]Users)
+	var resp []Users
+	whereIn := strings.Repeat(",?", len(ids))
+	query := fmt.Sprintf("select %s from %s where `id` in (%s)", usersRows, m.table, whereIn[1:])
+	err := m.QueryRowsNoCache(&resp, query, ids...)
+	switch err {
+	case nil:
+		for _, v := range resp {
+			mapList[v.Id] = v
+		}
+		return mapList, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
 	}
 }
 

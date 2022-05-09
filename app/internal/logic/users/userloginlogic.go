@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/wuyan94zl/IM/app/common/response"
 	utils2 "github.com/wuyan94zl/IM/app/common/utils"
 	"github.com/wuyan94zl/IM/app/models/user"
 	"time"
@@ -31,12 +32,12 @@ func (l *UserLoginLogic) UserLogin(req *types.LoginRequest) (*types.JwtTokenResp
 	info, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err != nil {
 		if err == user.ErrNotFound {
-			return nil, utils2.Error(401, "用户名不存在")
+			return nil, response.Error(401, "用户名不存在")
 		}
-		return nil, utils2.Error(401, err.Error())
+		return nil, response.Error(401, err.Error())
 	}
 	if info.Password != utils2.Md5ByString(req.Password) {
-		return nil, utils2.Error(401, "用户名密码错误")
+		return nil, response.Error(401, "用户名密码错误")
 	}
 
 	// 生成token

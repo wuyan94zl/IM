@@ -3,7 +3,7 @@ package group
 import (
 	"net/http"
 
-	"github.com/wuyan94zl/IM/app/common/utils"
+	"github.com/wuyan94zl/IM/app/common/response"
 	"github.com/wuyan94zl/IM/app/internal/logic/group"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/wuyan94zl/IM/app/internal/types"
@@ -20,6 +20,6 @@ func GroupListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := group.NewGroupListLogic(r.Context(), svcCtx)
 		resp, err := l.GroupList(&req)
-		utils.Response(w, r, resp, err)
+		response.Response(w, r, resp, err)
 	}
 }

@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/wuyan94zl/IM/app/common/response"
 	"net/http"
 
 	"github.com/wuyan94zl/IM/app/internal/logic/users"
@@ -19,10 +20,6 @@ func UserRegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := users.NewUserRegisterLogic(r.Context(), svcCtx)
 		resp, err := l.UserRegister(&req)
-		if err != nil {
-			httpx.OkJson(w, err)
-		} else {
-			httpx.OkJson(w, resp)
-		}
+		response.Response(w, r, resp, err)
 	}
 }

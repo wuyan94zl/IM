@@ -1,6 +1,7 @@
 package friend
 
 import (
+	"github.com/wuyan94zl/IM/app/common/response"
 	"net/http"
 
 	"github.com/wuyan94zl/IM/app/internal/logic/friend"
@@ -19,10 +20,6 @@ func FriendAddHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := friend.NewFriendAddLogic(r.Context(), svcCtx)
 		resp, err := l.FriendAdd(&req)
-		if err != nil {
-			httpx.Error(w, err)
-		} else {
-			httpx.OkJson(w, resp)
-		}
+		response.Response(w, r, resp, err)
 	}
 }

@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"github.com/wuyan94zl/IM/app/common/response"
 	utils2 "github.com/wuyan94zl/IM/app/common/utils"
 	"github.com/wuyan94zl/IM/app/models/user"
 	"time"
@@ -30,7 +31,7 @@ func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*types.Jwt
 	// 验证用户是否存在
 	_, err := l.svcCtx.UserModel.FindRawByName(l.ctx, req.UserName)
 	if err == nil {
-		return nil, utils2.Error(401, "用户已存在")
+		return nil, response.Error(401, "用户已存在")
 	}
 	// 注册用户
 	register := user.Users{
@@ -41,7 +42,7 @@ func (l *UserRegisterLogic) UserRegister(req *types.RegisterRequest) (*types.Jwt
 	}
 	insert, err := l.svcCtx.UserModel.Insert(l.ctx, &register)
 	if err != nil {
-		return nil, utils2.Error(401, "用户注册失败")
+		return nil, response.Error(401, "用户注册失败")
 	}
 	id, _ := insert.LastInsertId()
 

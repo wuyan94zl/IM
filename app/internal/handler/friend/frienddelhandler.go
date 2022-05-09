@@ -1,6 +1,7 @@
 package friend
 
 import (
+	"github.com/wuyan94zl/IM/app/common/response"
 	"net/http"
 
 	"github.com/wuyan94zl/IM/app/internal/logic/friend"
@@ -19,10 +20,6 @@ func FriendDelHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 
 		l := friend.NewFriendDelLogic(r.Context(), svcCtx)
 		resp, err := l.FriendDel(&req)
-		if err != nil {
-			httpx.Error(w, err)
-		} else {
-			httpx.OkJson(w, resp)
-		}
+		response.Response(w, r, resp, err)
 	}
 }

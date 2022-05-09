@@ -2,7 +2,7 @@ package friend
 
 import (
 	"context"
-	"encoding/json"
+	"github.com/wuyan94zl/IM/app/models/messages"
 	"github.com/wuyan94zl/IM/app/models/user"
 
 	"github.com/wuyan94zl/IM/app/internal/svc"
@@ -30,26 +30,35 @@ func (l *MessageListLogic) MessageList(req *types.MessageListRequest) (resp *typ
 	if err != nil {
 		return nil, err
 	}
-	id, _ := l.ctx.Value("id").(json.Number).Int64()
+
 	var rlt types.MessageListResponse
-	users := make(map[int64]*user.Users)
+	rlt.List = []types.Message{}
+	if len(list) < 1 {
+		return &rlt, nil
+	}
+
+	users, _ := l.WithUser(list)
+	id := l.svcCtx.AuthUser.Id
 	for _, item := range list {
-		u, ok := &user.Users{}, false
-		if u, ok = users[item.SendUserId]; !ok {
-			u, _ = l.svcCtx.UserModel.FindOne(l.ctx, item.SendUserId)
-			users[item.SendUserId] = u
-		}
 		t := 1
 		if item.SendUserId != id {
 			t = 0
 		}
 		rlt.List = append(rlt.List, types.Message{
 			UserId:   item.SendUserId,
-			NickName: u.NickName,
+			NickName: users[item.SendUserId].NickName,
 			Content:  item.Message,
 			SendTime: item.CreateTime.Format("2006-01-02 15:01:05"),
 			Tp:       int64(t),
 		})
 	}
 	return &rlt, nil
+}
+
+func (l *MessageListLogic) WithUser(msg []messages.Messages) (map[int64]user.Users, error) {
+	var uid []interface{}
+	for _, v := range msg {
+		uid = append(uid, v.SendUserId)
+	}
+	return l.svcCtx.UserModel.FindByIds(l.ctx, uid...)
 }

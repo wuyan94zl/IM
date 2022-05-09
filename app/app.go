@@ -8,7 +8,6 @@ import (
 	"github.com/wuyan94zl/IM/app/internal/handler"
 	"github.com/wuyan94zl/IM/app/internal/svc"
 	"github.com/zeromicro/go-zero/core/conf"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -17,7 +16,7 @@ var configFile = flag.String("f", "etc/app-api.yaml", "the config file")
 
 func main() {
 	flag.Parse()
-	logx.Disable()
+	//logx.Disable()
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
