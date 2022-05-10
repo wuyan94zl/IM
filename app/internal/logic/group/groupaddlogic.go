@@ -3,6 +3,7 @@ package group
 import (
 	"context"
 	"fmt"
+	"github.com/wuyan94zl/IM/app/common/im"
 	"github.com/wuyan94zl/IM/app/common/utils"
 	"github.com/wuyan94zl/IM/app/models/groups"
 	"github.com/wuyan94zl/IM/app/models/groupusers"
@@ -56,5 +57,6 @@ func (l *GroupAddLogic) GroupAdd(req *types.GroupAddRequest) (resp *types.Respon
 	if err != nil {
 		return nil, err
 	}
+	go im.JoinChannelIds(uint64(l.svcCtx.AuthUser.Id), groupItem.ChannelId)
 	return &types.Response{Message: "创建群组成功"}, nil
 }
