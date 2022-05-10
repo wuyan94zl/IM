@@ -35,7 +35,7 @@ func (l *GroupJoinLogic) GroupJoin(req *types.GroupJoinRequest) (resp *types.Res
 	if err != nil {
 		return nil, err
 	}
-	err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, info.Id, l.svcCtx.AuthUser.Id)
+	_, err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, info.Id, l.svcCtx.AuthUser.Id)
 	if err != groupusers.ErrNotFound {
 		if err != nil {
 			return nil, err

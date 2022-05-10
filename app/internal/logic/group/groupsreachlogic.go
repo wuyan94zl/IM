@@ -34,7 +34,7 @@ func (l *GroupSreachLogic) GroupSreach(req *types.GroupSreachRequest) (resp *typ
 		return nil, err
 	}
 	manager, _ := l.svcCtx.UserModel.FindOne(l.ctx, group.UserId)
-	err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, group.Id, l.svcCtx.AuthUser.Id)
+	_, err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, group.Id, l.svcCtx.AuthUser.Id)
 	isJoin := 1
 	if err != nil {
 		isJoin = 0

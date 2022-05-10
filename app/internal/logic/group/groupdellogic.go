@@ -2,8 +2,11 @@ package group
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/wuyan94zl/IM/app/common/im"
 	"github.com/wuyan94zl/IM/app/common/response"
+	"github.com/wuyan94zl/IM/app/models/notices"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 
 	"github.com/wuyan94zl/IM/app/internal/svc"
@@ -27,7 +30,7 @@ func NewGroupDelLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GroupDel
 }
 
 func (l *GroupDelLogic) GroupDel(req *types.GroupDelRequest) (resp *types.Response, err error) {
-	info, err := checkGroup(l.ctx,l.svcCtx,req.GroupId)
+	info, err := checkGroup(l.ctx, l.svcCtx, req.GroupId)
 	if err != nil {
 		return nil, err
 	}
@@ -50,6 +53,15 @@ func (l *GroupDelLogic) GroupDel(req *types.GroupDelRequest) (resp *types.Respon
 	if err != nil {
 		return nil, response.Error(500, fmt.Sprintf("删除失败：%v", err))
 	}
-
+	notice := notices.Notices{
+		PubUserId: l.svcCtx.AuthUser.Id,
+		SubUserId: info.UserId,
+		Tp:        notices.GROUP,
+		Content:   fmt.Sprintf("%s 解散了 %s 群组", l.svcCtx.AuthUser.NickName, info.Title),
+		Status:    1,
+	}
+	l.svcCtx.NoticeModel.Insert(l.ctx, &notice)
+	strByte, _ := json.Marshal(notice)
+	go im.SendMessageToChannelIds(uint64(l.svcCtx.AuthUser.Id), string(strByte), 202, info.ChannelId)
 	return &types.Response{Message: "删除成功"}, nil
 }

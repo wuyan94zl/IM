@@ -15,7 +15,7 @@ type (
 		groupUsersModel
 		TranCreate(ctx context.Context, session sqlx.Session, groupUserItem *GroupUsers) error
 		TranDeleteByGroupId(ctx context.Context, session sqlx.Session, groupId int64) error
-		IsInGroup(ctx context.Context, id, userId int64) error
+		IsInGroup(ctx context.Context, id, userId int64) (*GroupUsers, error)
 		InGroups(ctx context.Context, id int64) ([]GroupUsers, error)
 		FindUsersByChannelId(channelId string) ([]GroupUsers, error)
 	}
@@ -47,14 +47,14 @@ func (c *customGroupUsersModel) TranDeleteByGroupId(ctx context.Context, session
 	return err
 }
 
-func (c *customGroupUsersModel) IsInGroup(ctx context.Context, id, userId int64) error {
+func (c *customGroupUsersModel) IsInGroup(ctx context.Context, id, userId int64) (*GroupUsers, error) {
 	query := fmt.Sprintf("select %s from %s where `group_id` = ? and user_id = ?", groupUsersRows, c.table)
 	var u GroupUsers
 	err := c.conn.QueryRowCtx(ctx, &u, query, id, userId)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &u, nil
 }
 
 func (c *customGroupUsersModel) InGroups(ctx context.Context, id int64) ([]GroupUsers, error) {

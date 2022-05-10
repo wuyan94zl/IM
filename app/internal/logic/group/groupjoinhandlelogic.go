@@ -43,7 +43,7 @@ func (l *GroupJoinHandleLogic) GroupJoinHandle(req *types.GroupJoinHandleRequest
 		return nil, response.Error(404, "参数错误或已处理")
 	}
 
-	err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, log.LinkId, log.PubUserId)
+	_, err = l.svcCtx.GroupUserModel.IsInGroup(l.ctx, log.LinkId, log.PubUserId)
 	if err == nil {
 		return nil, response.Error(400, "已经加入群组")
 	}
