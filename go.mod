@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/wuyan94zl/chat v0.0.0-20220505030109-abcd3f04090b
+	github.com/wuyan94zl/chat v0.0.0-20220510080859-71ab7c6a3669
 	github.com/zeromicro/go-zero v1.3.3
 )
 

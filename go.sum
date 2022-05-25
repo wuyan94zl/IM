@@ -376,6 +376,8 @@ github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhV
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/wuyan94zl/chat v0.0.0-20220505030109-abcd3f04090b h1:ixvbEv0TXJPcp6M8hmmNNY/Br8zvVwY5MneBP2fLvaY=
 github.com/wuyan94zl/chat v0.0.0-20220505030109-abcd3f04090b/go.mod h1:jikHsD0+PGKSqp+EXPDizpwdPBnijeDSTSKrSzUCvAA=
+github.com/wuyan94zl/chat v0.0.0-20220510080859-71ab7c6a3669 h1:XddPu0Bjq4lkhrytEPUMbO+4BIFDUL8AIm4Yn3plUQ8=
+github.com/wuyan94zl/chat v0.0.0-20220510080859-71ab7c6a3669/go.mod h1:jikHsD0+PGKSqp+EXPDizpwdPBnijeDSTSKrSzUCvAA=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2/go.mod h1:1WAq6h33pAW+iRreB34OORO2Nf7qel3VV3fjBj+hCSs=
 github.com/xdg-go/stringprep v1.0.2/go.mod h1:8F9zXuvzgwmyT5DUm4GUfZGDdT3W+LCvS6+da4O5kxM=

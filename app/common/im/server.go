@@ -100,7 +100,7 @@ func (d *data) DelaySendMessage(channelId string, msg chart.Message, sent []uint
 		if channelId == "" {
 			ids = append(ids, int64(msg.ToUserId))
 		} else {
-			if len(sent) == 2 {// 单聊发送人数为2，则无离线消息 return
+			if len(sent) == 2 { // 单聊发送人数为2，则无离线消息 return
 				return
 			}
 			users, _ = d.ctx.UserUsersModel.AllChannelIdUsers(channelId)
